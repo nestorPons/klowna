@@ -1,0 +1,34 @@
+{{define "content"}}
+<section class="page-hero">
+  <div class="container">
+    <p class="eyebrow">Preguntas frecuentes</p>
+    <h1>Preguntas frecuentes sobre {{.Site.SiteName}}</h1>
+    <p class="lede">¿Tienes dudas sobre el ecosistema digital {{.Site.SiteName}}? Aquí resolvemos algunas de las consultas más comunes.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="faq">
+      {{range .FAQs}}
+      <details>
+        <summary>{{.Question}}</summary>
+        <p>{{.Answer}}</p>
+      </details>
+      {{end}}
+    </div>
+  </div>
+</section>
+
+<section class="section section-soft">
+  <div class="container">
+    <div class="cta-band cta-band-light">
+      <div>
+        <h2>¿Quieres ver {{.Site.SiteName}} en acción?</h2>
+        <p>Agenda una demo personalizada con uno de nuestros expertos.</p>
+      </div>
+      <a class="btn btn-primary" href="/contacto">Solicita una demo</a>
+    </div>
+  </div>
+</section>
+{{end}}

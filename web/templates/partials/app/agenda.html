@@ -1,0 +1,376 @@
+{{define "agenda-block"}}
+<section class="app-section agenda" id="agenda" data-view="{{.AgendaView}}" data-date="{{.AgendaDate}}" data-staff="{{.AgendaStaffFilter}}">
+  <div class="agenda-head">
+    <div>
+      <h2>Agenda</h2>
+      <p class="muted">{{if .User.IsManager}}Organiza, asigna y edita citas.{{else}}Tus citas asignadas.{{end}}</p>
+    </div>
+    <div class="agenda-nav">
+      <div class="agenda-views" role="tablist" aria-label="Vista de la agenda">
+        <button type="button" class="agenda-view{{if eq .AgendaView "day"}} is-active{{end}}"
+          hx-get="/app/agenda?view=day&date={{.AgendaDate}}{{if .AgendaStaffFilter}}&staff={{.AgendaStaffFilter}}{{end}}" hx-target="#agenda" hx-swap="outerHTML">Día</button>
+        <button type="button" class="agenda-view{{if eq .AgendaView "week"}} is-active{{end}}"
+          hx-get="/app/agenda?view=week&date={{.AgendaDate}}{{if .AgendaStaffFilter}}&staff={{.AgendaStaffFilter}}{{end}}" hx-target="#agenda" hx-swap="outerHTML">Semana</button>
+        <button type="button" class="agenda-view{{if eq .AgendaView "month"}} is-active{{end}}"
+          hx-get="/app/agenda?view=month&date={{.AgendaDate}}{{if .AgendaStaffFilter}}&staff={{.AgendaStaffFilter}}{{end}}" hx-target="#agenda" hx-swap="outerHTML">Mes</button>
+      </div>
+      {{if and .User.IsManager (eq .AgendaView "week")}}
+      <label class="agenda-staff-filter" title="Filtrar por trabajador">
+        <select data-staff-filter aria-label="Filtrar por trabajador">
+          <option value="">Todos los trabajadores</option>
+          {{range .Staff}}<option value="{{.ID}}"{{if eq .ID $.AgendaStaffFilter}} selected{{end}}>{{.Name}}</option>{{end}}
+        </select>
+      </label>
+      {{end}}
+      <button type="button" class="btn btn-icon" aria-label="Anterior"
+        hx-get="/app/agenda?view={{.AgendaView}}&date={{.PrevDate}}{{if .AgendaStaffFilter}}&staff={{.AgendaStaffFilter}}{{end}}" hx-target="#agenda" hx-swap="outerHTML">{{icon "arrow-left"}}</button>
+      <a class="btn btn-outline btn-sm" href="/app/agenda?view={{.AgendaView}}{{if .AgendaStaffFilter}}&staff={{.AgendaStaffFilter}}{{end}}">Hoy</a>
+      <span class="agenda-date">{{.AgendaDate}}</span>
+      <button type="button" class="btn btn-icon" aria-label="Siguiente"
+        hx-get="/app/agenda?view={{.AgendaView}}&date={{.NextDate}}{{if .AgendaStaffFilter}}&staff={{.AgendaStaffFilter}}{{end}}" hx-target="#agenda" hx-swap="outerHTML">{{icon "arrow-right"}}</button>
+      <label class="app-switch" title="Mostrar u ocultar los iconos de la agenda">
+        <input type="checkbox" role="switch" data-icons-toggle aria-label="Mostrar iconos" checked>
+        <span class="app-switch-track" aria-hidden="true"></span>
+        <span class="app-switch-label">Iconos</span>
+      </label>
+      {{if .User.IsManager}}
+      <details class="app-create">
+        <summary>{{icon "plus"}} Nueva cita</summary>
+        <form class="app-form-grid" hx-post="/app/appointments" hx-target="#agenda" hx-swap="outerHTML" data-appt-vat="{{.Billing.VATRate}}">
+          <input type="hidden" name="date" value="{{.AgendaDate}}">
+          <input type="hidden" name="view" value="{{.AgendaView}}">
+          <input type="hidden" name="staff" value="{{.AgendaStaffFilter}}">
+          <label>Cliente
+            <select name="patient_id" required>
+              <option value="">Selecciona…</option>
+              {{range .Patients}}<option value="{{.ID}}">{{.Name}}</option>{{end}}
+            </select>
+          </label>
+          <label>Empleado
+            <select name="assignee_id">
+              <option value="">Sin asignar</option>
+              {{range .Staff}}<option value="{{.ID}}">{{.Name}}</option>{{end}}
+            </select>
+          </label>
+          <label>Hora
+            <input type="text" name="time" value="09:00" required data-time24 inputmode="numeric" maxlength="5" placeholder="HH:MM" pattern="([01][0-9]|2[0-3]):[0-5][0-9]" autocomplete="off">
+          </label>
+          <label class="span-2">Servicios
+            <div class="svc-picker" data-svc-picker>
+              {{range .Services}}
+              <label class="svc-option">
+                <input type="checkbox" name="service_id" value="{{.ID}}" data-duration="{{.DurationMinutes}}" data-price="{{.Price}}" data-deposit="{{if .DepositRequired}}{{printf "%.2f" .DepositAmount}}{{else}}0{{end}}">
+                <span class="svc-option-name">{{.Name}}</span>
+                <span class="svc-option-dur">{{.DurationMinutes}} min</span>
+              </label>
+              {{else}}
+              <p class="muted">No hay servicios todavía. <a href="/app/servicios">Crea tu catálogo de servicios</a>.</p>
+              {{end}}
+            </div>
+            <span class="svc-total">Duración total: <strong data-svc-total>0</strong> min</span>
+          </label>
+          <label>Estado
+            <select name="status" data-appt-status>
+              {{range appointmentStatuses}}<option value="{{.Value}}">{{.Label}}</option>{{end}}
+            </select>
+          </label>
+          <label>Notas
+            <input name="notes" maxlength="500" placeholder="Cabina, preferencias…">
+          </label>
+          <label class="span-2 appt-payment" data-appt-payment hidden>Forma de pago
+            <select name="payment_method">
+              {{range paymentMethods}}<option value="{{.Value}}">{{.Label}}</option>{{end}}
+            </select>
+            <span class="appt-payment-hint">Al guardar se genera la factura, se cobra y se registra en caja. Total: <strong data-appt-total>0,00 €</strong></span>
+          </label>
+          <div class="span-2 appt-deposit" data-appt-deposit hidden>
+            <div class="appt-deposit-head">
+              <strong>Señal de reserva</strong>
+              <span>Pendiente: <strong data-appt-deposit-due>0,00 €</strong></span>
+            </div>
+            <div class="appt-deposit-fields">
+              <label class="appt-check">
+                <input type="checkbox" name="deposit_paid" value="1">
+                <span>Señal cobrada</span>
+              </label>
+              <label>Forma de pago de la señal
+                <select name="deposit_method">
+                  {{range paymentMethods}}<option value="{{.Value}}">{{.Label}}</option>{{end}}
+                </select>
+              </label>
+            </div>
+            <p class="appt-payment-hint">Si marcas «Señal cobrada», el importe se registra como ingreso en la caja del día.</p>
+          </div>
+          <button class="btn btn-primary" type="submit">Guardar cita</button>
+        </form>
+      </details>
+      {{end}}
+    </div>
+  </div>
+
+  {{if .FormError}}<div class="alert alert-error" role="alert">{{.FormError}}</div>{{end}}
+
+  <div class="agenda-body">
+    {{if eq .AgendaView "day"}}{{template "agenda-day" .}}
+    {{else if eq .AgendaView "week"}}{{template "agenda-week" .}}
+    {{else}}{{template "agenda-month" .}}{{end}}
+  </div>
+
+  {{if .User.IsManager}}{{template "agenda-modal" .}}{{end}}
+</section>
+{{end}}
+
+{{define "agenda-svc-list"}}
+<ul class="agenda-event-services">{{range .}}<li style="--svc: {{svcColor .Color}}"><span class="svc-icon">{{solidIcon (svcIcon .Icon)}}</span>{{.Name}}</li>{{end}}</ul>
+{{end}}
+
+{{define "agenda-hour-slots"}}
+{{range .}}<div class="agenda-slot" style="top:{{.Top}}%;height:{{.Height}}%" data-add-slot data-time="{{.Time}}"><button type="button" class="agenda-slot-add" aria-label="Nueva cita a las {{.Time}}">{{icon "plus"}}</button></div>{{end}}
+{{end}}
+
+{{define "agenda-day"}}
+<div class="agenda-day{{if .AgendaClosed}} is-closed{{end}}" data-day="{{.AgendaDate}}" data-manager="{{if .User.IsManager}}1{{else}}0{{end}}"{{if .AgendaClosed}} data-closed="1"{{end}}>
+  <div class="agenda-grid" data-cols="{{len .AgendaColumns}}">
+    <div class="agenda-time-axis">
+      <div class="agenda-corner"></div>
+      {{range .AgendaHours}}<div class="agenda-hour">{{.}}</div>{{end}}
+    </div>
+    {{range .AgendaColumns}}
+    <div class="agenda-col" data-assignee="{{.AssigneeID}}" data-name="{{.Name}}">
+      <div class="agenda-col-head" style="--staff: {{staffColor .Color}}"><span class="staff-icon">{{solidIcon (staffIcon .Icon)}}</span>{{.Name}}</div>
+      <div class="agenda-col-body"{{if not $.AgendaClosed}} data-drop data-closed="{{closedMinutes $.ClinicClosed .Closed}}"{{end}}>
+        {{if and $.User.IsManager (not $.AgendaClosed)}}{{template "agenda-hour-slots" (agendaSlots $.ClinicClosed .Closed)}}{{end}}
+        {{range $.ClinicClosed}}<div class="agenda-closed" style="top:{{slotTop .Start}}%;height:{{slotHeight .Start .End}}%"><span>Cerrado</span></div>{{end}}
+        {{range .Closed}}<div class="agenda-closed is-block" style="top:{{slotTop .Start}}%;height:{{slotHeight .Start .End}}%"><span>{{if .Label}}{{.Label}}{{else}}Cerrado{{end}}</span></div>{{end}}
+        {{range .Events}}
+        <div class="agenda-event status-{{.Status}}{{if or .Notes .DepositPending}} has-note{{end}}{{if $.User.IsManager}} is-editable{{end}}"
+             {{if $.User.IsManager}}draggable="true" title="{{.PatientName}} · {{hora .StartsAt}}–{{hora .EndsAt}}"{{end}}
+             data-id="{{.ID}}" data-patient="{{.PatientName}}" data-assignee="{{assigneeID .AssigneeID}}"
+             data-start="{{iso .StartsAt}}" data-end="{{iso .EndsAt}}"
+             data-status="{{.Status}}" data-notes="{{.Notes}}" data-services="{{json .Services}}"
+             data-deposit-due="{{printf "%.2f" .DepositDue}}" data-deposit-paid="{{printf "%.2f" .DepositPaid}}" data-deposit-method="{{.DepositMethod}}"
+             data-top="{{slotTop .StartsAt}}" data-height="{{slotHeight .StartsAt .EndsAt}}">
+          {{if .Services}}
+          <div class="agenda-segs">
+            {{range .Services}}
+            <div class="agenda-seg" style="--svc: {{svcColor .Color}}; flex-grow: {{.DurationMinutes}}">
+              <span class="agenda-seg-icon">{{solidIcon (svcIcon .Icon)}}</span>
+              <span class="agenda-seg-name">{{.Name}}</span>
+              <span class="agenda-seg-time">{{.DurationMinutes}}′</span>
+            </div>
+            {{end}}
+          </div>
+          {{end}}
+          <div class="agenda-event-meta">{{.PatientName}} · {{hora .StartsAt}}–{{hora .EndsAt}}</div>
+          {{if .DepositPending}}<span class="agenda-deposit-badge" title="{{.DepositLabel}}: {{money .DepositRemaining}}"></span>{{else if .Notes}}<span class="agenda-note-badge" title="{{.Notes}}"></span>{{end}}
+        </div>
+        {{end}}
+      </div>
+    </div>
+    {{end}}
+  </div>
+</div>
+{{end}}
+
+{{define "agenda-week"}}
+<div class="agenda-week" data-manager="{{if .User.IsManager}}1{{else}}0{{end}}">
+  <div class="agenda-week-grid">
+    <div class="agenda-week-time">
+      <div class="agenda-week-time-corner"></div>
+      <div class="agenda-week-time-spacer"></div>
+      {{range .AgendaHours}}<div class="agenda-week-hour">{{.}}</div>{{end}}
+    </div>
+    {{range .AgendaWeekDays}}
+    <div class="agenda-week-day{{if .IsToday}} is-today{{end}}{{if .Closed}} is-closed{{end}}"{{if .Closed}} data-closed="1" title="{{if .Holiday}}{{.Holiday}}{{else}}Cerrado{{end}}"{{end}}>
+      <div class="agenda-week-day-head">
+        <strong>{{.Weekday}}</strong>
+        <span>{{.Label}}{{if .Closed}} · {{if .Holiday}}{{.Holiday}}{{else}}Cerrado{{end}}{{end}}</span>
+      </div>
+      <div class="agenda-week-lanes">
+        {{$closed := .Closed}}
+        {{range .Slots}}
+        <div class="agenda-week-lane">
+          <div class="agenda-week-lane-head{{if $.AgendaStaffFilter}} has-name{{end}}" data-assignee="{{.AssigneeID}}" title="{{if eq .AssigneeID 0}}Sin asignar{{else}}{{.Name}}{{end}}" style="--staff: {{staffColor .Color}}">
+            {{solidIcon (staffIcon .Icon)}}
+            <span class="staff-initials">{{shortName .Name}}</span>
+            {{if $.AgendaStaffFilter}}<span class="agenda-week-lane-name">{{.Name}}</span>{{end}}
+          </div>
+          <div class="agenda-week-lane-body" data-day="{{.Date}}" data-assignee="{{.AssigneeID}}"{{if not $closed}} data-drop data-closed="{{closedMinutes .Closed}}"{{end}}>
+            {{if and $.User.IsManager (not $closed)}}{{template "agenda-hour-slots" (agendaSlots .Closed)}}{{end}}
+            {{range .Closed}}<div class="agenda-closed is-block" style="top:{{slotTop .Start}}%;height:{{slotHeight .Start .End}}%"><span>{{if .Label}}{{.Label}}{{else}}Cerrado{{end}}</span></div>{{end}}
+            {{range .Appointments}}
+            <div class="agenda-event agenda-event-week{{if $.AgendaStaffFilter}} is-expanded{{end}}{{if or .Notes .DepositPending}} has-note{{end}} status-{{.Status}}{{if $.User.IsManager}} is-editable{{end}}"
+                 {{if $.User.IsManager}}draggable="true" title="{{.PatientName}}: {{svcNames .Services}}"{{end}}
+                 data-id="{{.ID}}" data-patient="{{.PatientName}}" data-assignee="{{assigneeID .AssigneeID}}"
+                 data-start="{{iso .StartsAt}}" data-end="{{iso .EndsAt}}"
+                 data-status="{{.Status}}" data-notes="{{.Notes}}" data-services="{{json .Services}}"
+                 data-deposit-due="{{printf "%.2f" .DepositDue}}" data-deposit-paid="{{printf "%.2f" .DepositPaid}}" data-deposit-method="{{.DepositMethod}}"
+                 data-top="{{slotTop .StartsAt}}" data-height="{{slotHeight .StartsAt .EndsAt}}">
+              {{if $.AgendaStaffFilter}}
+              {{if .Services}}
+              <div class="agenda-segs">
+                {{range .Services}}
+                <div class="agenda-seg" style="--svc: {{svcColor .Color}}; flex-grow: {{.DurationMinutes}}">
+                  <span class="agenda-seg-icon">{{solidIcon (svcIcon .Icon)}}</span>
+                  <span class="agenda-seg-name">{{.Name}}</span>
+                  <span class="agenda-seg-time">{{.DurationMinutes}}′</span>
+                </div>
+                {{end}}
+              </div>
+              {{end}}
+              <div class="agenda-event-meta">{{.PatientName}} · {{hora .StartsAt}}–{{hora .EndsAt}}</div>
+              {{else}}
+              {{if .Services}}
+              {{range .Services}}
+              <div class="agenda-seg-week" style="--svc: {{svcColor .Color}}; flex-grow: {{.DurationMinutes}}" title="{{.Name}} ({{.DurationMinutes}} min)">
+                <span class="agenda-seg-icon">{{solidIcon (svcIcon .Icon)}}</span>
+              </div>
+              {{end}}
+              {{else}}
+              <div class="agenda-seg-week" style="--svc: var(--accent)"></div>
+              {{end}}
+              {{end}}
+              {{if .DepositPending}}<span class="agenda-deposit-badge" title="{{.DepositLabel}}: {{money .DepositRemaining}}"></span>{{else if .Notes}}<span class="agenda-note-badge" title="{{.Notes}}"></span>{{end}}
+            </div>
+            {{end}}
+          </div>
+        </div>
+        {{end}}
+      </div>
+    </div>
+    {{end}}
+  </div>
+</div>
+{{end}}
+
+{{define "agenda-month"}}
+<div class="agenda-month" data-manager="{{if .User.IsManager}}1{{else}}0{{end}}">
+  <div class="agenda-month-head">
+    <div class="agenda-month-wd">lun</div>
+    <div class="agenda-month-wd">mar</div>
+    <div class="agenda-month-wd">mié</div>
+    <div class="agenda-month-wd">jue</div>
+    <div class="agenda-month-wd">vie</div>
+    <div class="agenda-month-wd">sáb</div>
+    <div class="agenda-month-wd">dom</div>
+  </div>
+  <div class="agenda-month-grid">
+    {{range .AgendaDays}}
+    <div class="agenda-month-day{{if not .InMonth}} is-out{{end}}{{if .IsToday}} is-today{{end}}{{if .Closed}} is-closed{{end}}" data-day="{{.Date}}"{{if not .Closed}} data-drop{{end}}{{if .Holiday}} title="{{.Holiday}}"{{end}}>
+      <span class="agenda-month-num">{{.Num}}</span>
+      {{if .Closed}}<span class="agenda-month-closed">{{if .Holiday}}{{.Holiday}}{{else}}Cerrado{{end}}</span>{{end}}
+      <div class="agenda-month-events">
+        {{range .Appointments}}
+        <div class="agenda-chip status-{{.Status}}{{if $.User.IsManager}} is-editable{{end}}"
+             {{if $.User.IsManager}}draggable="true" title="Doble clic para editar"{{end}}
+             data-id="{{.ID}}" data-patient="{{.PatientName}}" data-assignee="{{assigneeID .AssigneeID}}"
+             data-start="{{iso .StartsAt}}" data-end="{{iso .EndsAt}}"
+             data-status="{{.Status}}" data-notes="{{.Notes}}" data-services="{{json .Services}}"
+             data-deposit-due="{{printf "%.2f" .DepositDue}}" data-deposit-paid="{{printf "%.2f" .DepositPaid}}" data-deposit-method="{{.DepositMethod}}">
+          <span>{{hora .StartsAt}}</span>{{.PatientName}}
+          {{if .DepositPending}}<span class="agenda-chip-deposit" title="{{.DepositLabel}}: {{money .DepositRemaining}}"></span>{{else if .Notes}}<span class="agenda-chip-note" title="{{.Notes}}"></span>{{end}}
+        </div>
+        {{end}}
+      </div>
+    </div>
+    {{end}}
+  </div>
+</div>
+{{end}}
+
+{{define "agenda-modal"}}
+<div class="modal" id="appt-modal" hidden>
+  <div class="modal-backdrop" data-modal-close></div>
+  <div class="modal-card modal-card-agenda" role="dialog" aria-modal="true" aria-labelledby="appt-modal-title">
+    <div class="modal-head">
+      <h3 id="appt-modal-title">Editar cita</h3>
+      <button type="button" class="btn btn-icon" data-modal-close aria-label="Cerrar">{{icon "x"}}</button>
+    </div>
+    <form data-appt-form data-appt-vat="{{.Billing.VATRate}}">
+      <input type="hidden" name="id">
+      <div class="app-form-grid">
+        <label>Cliente
+          <input name="patient" disabled>
+        </label>
+        <label>Empleado
+          <select name="assignee_id">
+            <option value="">Sin asignar</option>
+            {{range .Staff}}<option value="{{.ID}}">{{.Name}}</option>{{end}}
+          </select>
+        </label>
+        <label>Fecha
+          <input type="date" name="date" required>
+        </label>
+        <label>Hora inicio
+          <input type="text" name="time" required data-time24 inputmode="numeric" maxlength="5" placeholder="HH:MM" pattern="([01][0-9]|2[0-3]):[0-5][0-9]" autocomplete="off">
+        </label>
+        <label>Estado
+          <select name="status" data-appt-status>
+            {{range appointmentStatuses}}<option value="{{.Value}}">{{.Label}}</option>{{end}}
+          </select>
+        </label>
+        <div class="span-2">
+          <span class="svc-label">Servicios</span>
+          <div class="svc-picker" data-svc-picker>
+            {{range .Services}}
+            <label class="svc-option">
+              <input type="checkbox" name="service_id" value="{{.ID}}" data-duration="{{.DurationMinutes}}" data-price="{{.Price}}" data-deposit="{{if .DepositRequired}}{{printf "%.2f" .DepositAmount}}{{else}}0{{end}}">
+              <span class="svc-option-name">{{.Name}}</span>
+              <span class="svc-option-dur">{{.DurationMinutes}} min</span>
+            </label>
+            {{else}}
+            <p class="muted">No hay servicios todavía. <a href="/app/servicios">Crea tu catálogo de servicios</a>.</p>
+            {{end}}
+          </div>
+          <span class="svc-total">Duración total: <strong data-svc-total>0</strong> min</span>
+        </div>
+        <div class="span-2 appt-payment" data-appt-payment hidden>
+          <div class="appt-payment-grid">
+            <label>Forma de pago
+              <select name="payment_method">
+                {{range paymentMethods}}<option value="{{.Value}}">{{.Label}}</option>{{end}}
+              </select>
+            </label>
+            <div class="appt-payment-total">
+              <span>Total a cobrar (IVA {{printf "%.0f" .Billing.VATRate}}% incl.)</span>
+              <strong data-appt-total>0,00 €</strong>
+            </div>
+          </div>
+          <p class="muted">Al guardar se genera la factura, se marca como abonada y el cobro queda registrado en caja.</p>
+        </div>
+        <div class="span-2 appt-deposit" data-appt-deposit hidden>
+          <div class="appt-deposit-head">
+            <strong>Señal de reserva</strong>
+            <span data-appt-deposit-status>Pendiente: <strong data-appt-deposit-due>0,00 €</strong></span>
+          </div>
+          <div class="appt-deposit-fields">
+            <label class="appt-check">
+              <input type="checkbox" name="deposit_paid" value="1" data-deposit-check>
+              <span>Señal cobrada</span>
+            </label>
+            <label>Forma de pago de la señal
+              <select name="deposit_method">
+                {{range paymentMethods}}<option value="{{.Value}}">{{.Label}}</option>{{end}}
+              </select>
+            </label>
+          </div>
+          <p class="appt-payment-hint">Si marcas «Señal cobrada», la parte pendiente se registra como ingreso en la caja del día.</p>
+        </div>
+        <label class="span-2">Notas
+          <textarea name="notes" rows="2" maxlength="500"></textarea>
+        </label>
+      </div>
+      <div class="modal-actions">
+        <div class="modal-actions-left">
+          <button type="button" class="btn btn-danger" data-appt-delete>{{icon "trash"}} Eliminar</button>
+          <button type="button" class="btn btn-outline" data-appt-invoice>{{icon "card"}} Crear factura</button>
+        </div>
+        <div class="modal-actions-right">
+          <button type="button" class="btn btn-outline" data-modal-close>Cancelar</button>
+          <button type="submit" class="btn btn-primary">Guardar</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{{end}}

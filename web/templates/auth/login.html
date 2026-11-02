@@ -1,0 +1,36 @@
+{{define "auth-content"}}
+<div class="auth-card">
+  <a class="brand app-brand" href="/" aria-label="{{.Site.SiteName}} · inicio">
+    <span class="brand-mark" aria-hidden="true">
+      <svg viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <rect width="32" height="32" rx="10" fill="#96675B"></rect>
+        <rect x="8" y="10" width="16" height="14" rx="3" stroke="#FBF8F5" stroke-width="2"></rect>
+        <path d="M8 14h16" stroke="#FBF8F5" stroke-width="2"></path>
+        <path d="M12 7v5M20 7v5" stroke="#FBF8F5" stroke-width="2" stroke-linecap="round"></path>
+        <circle cx="12.5" cy="19" r="1.2" fill="#FBF8F5"></circle>
+        <circle cx="16" cy="19" r="1.2" fill="#FBF8F5"></circle>
+        <circle cx="19.5" cy="19" r="1.2" fill="#FBF8F5"></circle>
+      </svg>
+    </span>
+    <span class="brand-name">{{.Site.SiteName}}</span>
+  </a>
+
+  <h1>Accede a tu panel</h1>
+  <p class="muted">Gestiona tu agenda, clientes y facturación.</p>
+
+  {{if .FormError}}<div class="alert alert-error" role="alert">{{.FormError}}</div>{{end}}
+
+  <form class="auth-form" method="post" action="/login">
+    <label>Email
+      <input type="email" name="email" maxlength="160" autocomplete="username" required autofocus>
+    </label>
+    <label>Contraseña
+      <input type="password" name="password" autocomplete="current-password" required>
+    </label>
+    <button class="btn btn-primary btn-block" type="submit">Entrar</button>
+  </form>
+
+  <p class="auth-hint">Demo: <code>demo@klowna.com</code> · <code>klowna1234</code></p>
+  <a class="auth-back" href="/">{{icon "arrow-left"}} Volver a la web</a>
+</div>
+{{end}}

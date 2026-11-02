@@ -1,0 +1,179 @@
+{{define "app-content"}}
+{{with .Patient}}
+<div class="app-head">
+  <a class="link-arrow" href="/app/pacientes">{{icon "arrow-left"}} Clientes</a>
+  <div class="app-head-row">
+    <div>
+      <h1>{{.Name}}</h1>
+      <p class="muted">{{if .Email}}{{.Email}}{{end}}{{if .Email}}{{if .Phone}} · {{end}}{{end}}{{.Phone}}</p>
+    </div>
+    <a class="btn btn-outline btn-sm" href="#editar">Editar ficha</a>
+  </div>
+</div>
+
+<section class="app-section patient-summary">
+  <div class="app-section-head">
+    <div><h2>Notas generales</h2></div>
+  </div>
+  {{if .Notes}}<p>{{.Notes}}</p>{{else}}<p class="muted">Sin notas generales.</p>{{end}}
+</section>
+
+<section class="app-section patient-history" id="historial">
+  <div class="app-section-head">
+    <div>
+      <h2>Historial del cliente</h2>
+      <p class="muted">Notas, comentarios y seguimientos. Cada entrada se puede editar o eliminar.</p>
+    </div>
+  </div>
+
+  <form class="app-form-grid history-form" method="post" action="/app/pacientes/{{.ID}}/historial">
+    <label>Tipo
+      <select name="entry_type">
+        {{range historyTypes}}<option value="{{.Value}}">{{.Label}}</option>{{end}}
+      </select>
+    </label>
+    <label class="span-2">Nueva entrada
+      <textarea name="content" rows="3" maxlength="4000" required placeholder="Evolución, preferencias, incidencias, comentarios…"></textarea>
+    </label>
+    <button class="btn btn-primary" type="submit">{{icon "plus"}} Añadir al historial</button>
+  </form>
+
+  {{if $.PatientHistory}}
+  <div class="history-list">
+    {{range $.PatientHistory}}
+    <article class="history-item">
+      <div class="history-item-head">
+        <div>
+          <span class="status status-{{.EntryType}}">{{historyLabel .EntryType}}</span>
+          <strong>{{if .AuthorName}}{{.AuthorName}}{{else}}Equipo{{end}}</strong>
+          <span class="muted">{{fecha .CreatedAt}} · {{hora .CreatedAt}}</span>
+          {{if ne .CreatedAt .UpdatedAt}}<span class="muted">· editado</span>{{end}}
+        </div>
+        <details class="history-edit">
+          <summary class="btn btn-sm btn-outline">Editar</summary>
+          <form class="history-edit-form" method="post" action="/app/pacientes/{{$.Patient.ID}}/historial/{{.ID}}">
+            <label>Tipo
+              <select name="entry_type">
+                {{$entry := .}}{{range historyTypes}}<option value="{{.Value}}"{{if eq .Value $entry.EntryType}} selected{{end}}>{{.Label}}</option>{{end}}
+              </select>
+            </label>
+            <label>Contenido
+              <textarea name="content" rows="3" maxlength="4000" required>{{.Content}}</textarea>
+            </label>
+            <div class="history-edit-actions">
+              <button class="btn btn-primary btn-sm" type="submit">Guardar</button>
+            </div>
+          </form>
+          <form method="post" action="/app/pacientes/{{$.Patient.ID}}/historial/{{.ID}}/eliminar" onsubmit="return confirm('¿Eliminar esta entrada del historial?')">
+            <button class="btn btn-outline btn-danger btn-sm" type="submit">{{icon "trash"}} Eliminar</button>
+          </form>
+        </details>
+      </div>
+      <p class="history-content">{{.Content}}</p>
+    </article>
+    {{end}}
+  </div>
+  {{else}}
+  <p class="muted">Sin entradas en el historial.</p>
+  {{end}}
+</section>
+
+<section class="app-section">
+  <div class="app-section-head">
+    <div>
+      <h2>Servicios realizados</h2>
+      <p class="muted">Servicios de citas realizadas, facturadas o abonadas.</p>
+    </div>
+  </div>
+  {{if $.PatientServices}}
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Fecha</th><th>Servicio</th><th>Duración</th><th>Importe</th><th>Estado</th></tr></thead>
+      <tbody>
+        {{range $.PatientServices}}
+        <tr>
+          <td>{{fecha .StartsAt}}</td>
+          <td>{{.ServiceName}}</td>
+          <td>{{.DurationMinutes}} min</td>
+          <td>{{money .Price}}</td>
+          <td><span class="status status-{{.Status}}">{{statusLabel .Status}}</span></td>
+        </tr>
+        {{end}}
+      </tbody>
+    </table>
+  </div>
+  {{else}}
+  <p class="muted">Todavía no hay servicios realizados.</p>
+  {{end}}
+</section>
+
+<section class="app-section">
+  <div class="app-section-head">
+    <div><h2>Citas</h2></div>
+  </div>
+  {{if $.Appointments}}
+  <div class="app-list">
+    {{range $.Appointments}}
+    <div class="app-list-item">
+      <span class="time-badge">{{fecha .StartsAt}}</span>
+      <div class="app-list-main"><strong>{{svcNames .Services}}</strong><em>{{hora .StartsAt}}–{{hora .EndsAt}}</em></div>
+      {{if .DepositPending}}<span class="deposit-flag" title="{{.DepositLabel}}: {{money .DepositRemaining}}">Señal</span>{{end}}
+      <span class="status status-{{.Status}}">{{statusLabel .Status}}</span>
+    </div>
+    {{end}}
+  </div>
+  {{else}}
+  <p class="muted">Sin citas registradas.</p>
+  {{end}}
+</section>
+
+<section class="app-section">
+  <div class="app-section-head">
+    <div><h2>Facturas</h2></div>
+  </div>
+  {{if $.Invoices}}
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Número</th><th>Concepto</th><th>Importe</th><th>Estado</th><th></th></tr></thead>
+      <tbody>
+        {{range $.Invoices}}
+        <tr class="invoice-row" data-invoice-id="{{.ID}}" title="Doble clic para ver la factura">
+          <td>{{.Number}}</td>
+          <td>{{.Concept}}</td>
+          <td>{{money .Amount}}</td>
+          <td><span class="status status-{{.Status}}">{{.Status}}</span></td>
+          <td class="cell-actions">
+            <button class="btn btn-sm btn-outline" type="button" data-invoice-view="{{.ID}}">Ver</button>
+          </td>
+        </tr>
+        {{end}}
+      </tbody>
+    </table>
+  </div>
+  {{else}}
+  <p class="muted">Sin facturas registradas.</p>
+  {{end}}
+</section>
+
+<section class="app-section" id="editar">
+  <div class="app-section-head">
+    <div><h2>Editar ficha</h2></div>
+  </div>
+  <form class="app-form-grid" method="post" action="/app/pacientes/{{.ID}}">
+    <label>Nombre
+      <input name="name" maxlength="120" required value="{{.Name}}">
+    </label>
+    <label>Email
+      <input type="email" name="email" maxlength="160" value="{{.Email}}">
+    </label>
+    <label>Teléfono
+      <input name="phone" maxlength="40" value="{{.Phone}}">
+    </label>
+    <label class="span-2">Notas generales
+      <textarea name="notes" rows="3" maxlength="2000">{{.Notes}}</textarea>
+    </label>
+    <button class="btn btn-primary" type="submit">Guardar cambios</button>
+  </form>
+</section>
+{{end}}
+{{end}}

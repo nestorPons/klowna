@@ -1,0 +1,19 @@
+{{define "auth"}}<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{.Title}}</title>
+  <meta name="description" content="{{.Description}}">
+  <meta name="theme-color" content="#FBF8F5">
+  <link rel="icon" href="/static/img/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/css/theme.css?v=7">
+  <link rel="stylesheet" href="/static/css/style.css?v=10">
+  <link rel="stylesheet" href="/static/css/app.css?v=12">
+</head>
+<body class="auth-body">
+  <main id="main">
+    {{template "auth-content" .}}
+  </main>
+</body>
+</html>{{end}}

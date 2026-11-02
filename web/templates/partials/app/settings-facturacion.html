@@ -1,0 +1,32 @@
+{{define "settings-facturacion-block"}}
+<section class="app-section" id="billing-settings">
+  <div class="app-section-head">
+    <div>
+      <h2>Datos de facturación</h2>
+      <p class="muted">Estos datos aparecen en todas las facturas que emitas.</p>
+    </div>
+  </div>
+
+  <form class="app-form-grid" method="post" action="/app/configuracion/facturacion">
+    <label>Nombre o razón social
+      <input name="company_name" maxlength="160" required value="{{.Billing.CompanyName}}" placeholder="Clínica Demo S.L.">
+    </label>
+    <label>NIF / CIF
+      <input name="tax_id" maxlength="40" value="{{.Billing.TaxID}}" placeholder="B12345678">
+    </label>
+    <label class="span-2">Dirección
+      <input name="address" maxlength="255" value="{{.Billing.Address}}" placeholder="Calle, número, CP y ciudad">
+    </label>
+    <label>Teléfono
+      <input name="phone" maxlength="40" value="{{.Billing.Phone}}">
+    </label>
+    <label>Email
+      <input type="email" name="email" maxlength="160" value="{{.Billing.Email}}">
+    </label>
+    <label>IVA por defecto (%)
+      <input name="vat_rate" type="number" min="0" max="100" step="0.01" required value="{{printf "%.2f" .Billing.VATRate}}">
+    </label>
+    <button class="btn btn-primary" type="submit">Guardar facturación</button>
+  </form>
+</section>
+{{end}}

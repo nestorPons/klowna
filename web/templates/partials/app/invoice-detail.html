@@ -1,0 +1,87 @@
+{{define "invoice-detail-block"}}
+<div id="invoice-detail" class="invoice-detail">
+  <div class="invoice-detail-head">
+    <div>
+      <span class="invoice-kicker">Factura</span>
+      <h2>{{.Invoice.Number}}</h2>
+      <p class="muted">
+        {{fecha .Invoice.IssuedAt}} ·
+        <span class="status status-{{.Invoice.Status}}">{{.Invoice.Status}}</span>
+      </p>
+    </div>
+    <button type="button" class="btn btn-icon no-print" data-invoice-close aria-label="Cerrar">{{icon "x"}}</button>
+  </div>
+
+  <div class="invoice-parties">
+    <div>
+      <span class="invoice-label">Emisor</span>
+      {{if .Billing.CompanyName}}
+      <strong>{{.Billing.CompanyName}}</strong>
+      {{if .Billing.TaxID}}<span>NIF/CIF: {{.Billing.TaxID}}</span>{{end}}
+      {{if .Billing.Address}}<span>{{.Billing.Address}}</span>{{end}}
+      {{if .Billing.Phone}}<span>{{.Billing.Phone}}</span>{{end}}
+      {{if .Billing.Email}}<span>{{.Billing.Email}}</span>{{end}}
+      {{else}}
+      <strong>Sin datos fiscales</strong>
+      <a href="/app/configuracion/facturacion">Configura los datos de tu empresa</a>
+      {{end}}
+    </div>
+    <div>
+      <span class="invoice-label">Cliente</span>
+      <strong>{{.Invoice.PatientName}}</strong>
+    </div>
+  </div>
+
+  <div class="table-wrap invoice-lines">
+    <table>
+      <thead>
+        <tr><th>Descripción</th><th>Cant.</th><th>Precio</th><th>IVA</th><th>Importe</th></tr>
+      </thead>
+      <tbody>
+        {{range .Invoice.Items}}
+        <tr>
+          <td>{{.Description}}</td>
+          <td>{{.Quantity}}</td>
+          <td>{{money .UnitPrice}}</td>
+          <td>{{printf "%.0f" .VATRate}}%</td>
+          <td>{{money .LineTotal}}</td>
+        </tr>
+        {{else}}
+        <tr>
+          <td>{{.Invoice.Concept}}</td>
+          <td>1</td>
+          <td>{{money .Invoice.Subtotal}}</td>
+          <td>{{printf "%.0f" .Invoice.VATRate}}%</td>
+          <td>{{money .Invoice.Subtotal}}</td>
+        </tr>
+        {{end}}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="invoice-totals">
+    <div><span>Base imponible</span><strong>{{money .Invoice.Subtotal}}</strong></div>
+    <div><span>IVA ({{printf "%.0f" .Invoice.VATRate}}%)</span><strong>{{money .Invoice.VATAmount}}</strong></div>
+    <div class="invoice-total"><span>Total</span><strong>{{money .Invoice.Amount}}</strong></div>
+  </div>
+
+  {{if .Invoice.PaidAt}}<p class="muted">Pagada el {{.Invoice.PaidAt.Format "02/01/2006"}}{{if .Invoice.PaymentMethod}} · {{paymentLabel .Invoice.PaymentMethod}}{{end}}.</p>{{end}}
+
+  <div class="invoice-detail-actions no-print">
+    <a class="btn btn-outline" href="/app/facturas/{{.Invoice.ID}}/pdf" target="_blank" rel="noopener">{{icon "file"}} Descargar PDF</a>
+    <button class="btn btn-outline" type="button" onclick="window.print()">{{icon "file"}} Imprimir</button>
+    {{if eq .Invoice.Status "pendiente"}}
+    <button class="btn btn-outline" type="button" data-invoice-edit="{{.Invoice.ID}}">{{icon "box"}} Editar</button>
+    <form class="invoice-pay-form" hx-post="/app/facturas/{{.Invoice.ID}}/pagar" hx-target="#invoice-detail" hx-swap="outerHTML">
+      <input type="hidden" name="detail" value="1">
+      <label>Forma de pago
+        <select name="payment_method">
+          {{range paymentMethods}}<option value="{{.Value}}">{{.Label}}</option>{{end}}
+        </select>
+      </label>
+      <button class="btn btn-primary" type="submit">Marcar pagada</button>
+    </form>
+    {{end}}
+  </div>
+</div>
+{{end}}

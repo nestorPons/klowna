@@ -1,0 +1,51 @@
+{{define "invoices-block"}}
+<section class="app-section" id="invoices">
+  <div class="app-section-head">
+    <div>
+      <h2>Facturación</h2>
+      <p class="muted">Controla cobros y facturas. Doble clic en una factura para verla.</p>
+    </div>
+    <div class="app-filters" role="tablist" aria-label="Filtrar facturas">
+      <button class="filter{{if eq .Query ""}} is-active{{end}}" type="button"
+        hx-get="/app/facturacion" hx-target="#invoices" hx-swap="outerHTML" hx-push-url="true">Todas</button>
+      <button class="filter{{if eq .Query "pendiente"}} is-active{{end}}" type="button"
+        hx-get="/app/facturacion?status=pendiente" hx-target="#invoices" hx-swap="outerHTML" hx-push-url="true">Pendientes</button>
+      <button class="filter{{if eq .Query "pagada"}} is-active{{end}}" type="button"
+        hx-get="/app/facturacion?status=pagada" hx-target="#invoices" hx-swap="outerHTML" hx-push-url="true">Pagadas</button>
+    </div>
+  </div>
+
+  {{if .FormError}}<div class="alert alert-error" role="alert">{{.FormError}}</div>{{end}}
+
+  <details class="app-create">
+    <summary>{{icon "plus"}} Nueva factura</summary>
+    <form class="app-form-grid" hx-post="/app/facturas" hx-target="#invoices" hx-swap="outerHTML">
+      <label>Cliente
+        <select name="patient_id" required>
+          <option value="">Selecciona…</option>
+          {{range .Patients}}<option value="{{.ID}}">{{.Name}}</option>{{end}}
+        </select>
+      </label>
+      <label>Concepto
+        <input name="concept" maxlength="255" value="Servicios prestados" placeholder="Tratamiento…">
+      </label>
+      <label>Base imponible (€)
+        <input name="amount" type="number" step="0.01" min="0" required placeholder="0,00">
+      </label>
+      <button class="btn btn-primary" type="submit">Crear factura</button>
+    </form>
+  </details>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Número</th><th>Cliente</th><th>Concepto</th><th>Fecha</th><th>Total</th><th>Estado</th><th></th></tr>
+      </thead>
+      <tbody>
+        {{range .Invoices}}{{template "invoice-row-block" .}}{{end}}
+      </tbody>
+    </table>
+    {{if not .Invoices}}<p class="muted">No hay facturas.</p>{{end}}
+  </div>
+</section>
+{{end}}

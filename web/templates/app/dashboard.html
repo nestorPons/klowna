@@ -1,0 +1,66 @@
+{{define "app-content"}}
+<div class="app-head">
+  <h1>Hola, {{.User.Name}}</h1>
+  <p class="muted">Resumen de tu clínica a día de hoy.</p>
+</div>
+
+{{if .AppStats}}
+<div class="stat-cards">
+  <div class="stat-card">
+    <span class="stat-card-icon">{{icon "users"}}</span>
+    <strong>{{.AppStats.Patients}}</strong>
+    <span>Clientes</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-card-icon">{{icon "calendar"}}</span>
+    <strong>{{.AppStats.AppointmentsDay}}</strong>
+    <span>Citas hoy</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-card-icon">{{icon "card"}}</span>
+    <strong>{{.AppStats.PendingInvoices}}</strong>
+    <span>Facturas pendientes</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-card-icon">{{icon "euro"}}</span>
+    <strong>{{money .AppStats.CollectedAmount}}</strong>
+    <span>Cobrado</span>
+  </div>
+  {{if .AppStats.CashToday}}
+  <div class="stat-card">
+    <span class="stat-card-icon">{{icon "chart"}}</span>
+    <strong>{{money .AppStats.CashExpected}}</strong>
+    <span>Efectivo en caja</span>
+  </div>
+  {{end}}
+</div>
+{{end}}
+
+<section class="app-section">
+  <div class="app-section-head">
+    <div>
+      <h2>Citas de hoy</h2>
+      <p class="muted">Próximas citas programadas.</p>
+    </div>
+    <a class="btn btn-outline btn-sm" href="/app/agenda">Ver agenda</a>
+  </div>
+
+  {{if .Appointments}}
+  <div class="app-list">
+    {{range .Appointments}}
+    <div class="app-list-item">
+      <span class="time-badge">{{hora .StartsAt}}–{{hora .EndsAt}}</span>
+      <div class="app-list-main">
+        <strong>{{svcNames .Services}}</strong>
+        <em>{{.PatientName}}</em>
+      </div>
+      {{if .DepositPending}}<span class="deposit-flag" title="{{.DepositLabel}}: {{money .DepositRemaining}}">Señal</span>{{end}}
+      <span class="status status-{{.Status}}">{{statusLabel .Status}}</span>
+    </div>
+    {{end}}
+  </div>
+  {{else}}
+  <p class="muted">No tienes citas programadas para hoy.</p>
+  {{end}}
+</section>
+{{end}}

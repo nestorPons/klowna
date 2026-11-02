@@ -1,0 +1,53 @@
+{{define "invoice-edit-block"}}
+<div id="invoice-edit" class="invoice-detail">
+  <div class="invoice-detail-head">
+    <div>
+      <span class="invoice-kicker">Editar factura</span>
+      <h2>{{.Invoice.Number}}</h2>
+      <p class="muted">{{.Invoice.PatientName}}</p>
+    </div>
+    <button type="button" class="btn btn-icon no-print" data-invoice-close aria-label="Cerrar">{{icon "x"}}</button>
+  </div>
+
+  {{if .FormError}}<div class="alert alert-error" role="alert">{{.FormError}}</div>{{end}}
+
+  <form class="invoice-edit-form" data-invoice-edit-form action="/app/facturas/{{.Invoice.ID}}" method="post">
+    <div class="invoice-edit-fields">
+      <label>Concepto
+        <input name="concept" maxlength="255" value="{{.Invoice.Concept}}">
+      </label>
+      <label>IVA (%)
+        <input name="vat_rate" type="number" min="0" max="100" step="0.01" value="{{printf "%.2f" .Invoice.VATRate}}">
+      </label>
+    </div>
+
+    <div class="invoice-edit-lines" data-invoice-lines>
+      <div class="invoice-edit-line invoice-edit-line-head">
+        <span>Descripción</span><span>Cant.</span><span>Precio (€)</span><span></span>
+      </div>
+      {{range .Invoice.Items}}
+      <div class="invoice-edit-line">
+        <input name="line_description" maxlength="255" value="{{.Description}}" placeholder="Descripción">
+        <input name="line_qty" type="number" min="1" step="1" value="{{.Quantity}}">
+        <input name="line_price" type="number" min="0" step="0.01" value="{{printf "%.2f" .UnitPrice}}">
+        <button type="button" class="btn btn-icon btn-danger" data-line-remove title="Eliminar línea">{{icon "trash"}}</button>
+      </div>
+      {{else}}
+      <div class="invoice-edit-line">
+        <input name="line_description" maxlength="255" value="{{.Invoice.Concept}}" placeholder="Descripción">
+        <input name="line_qty" type="number" min="1" step="1" value="1">
+        <input name="line_price" type="number" min="0" step="0.01" value="{{printf "%.2f" .Invoice.Subtotal}}">
+        <button type="button" class="btn btn-icon btn-danger" data-line-remove title="Eliminar línea">{{icon "trash"}}</button>
+      </div>
+      {{end}}
+    </div>
+
+    <button type="button" class="btn btn-outline btn-sm" data-line-add>{{icon "plus"}} Añadir línea</button>
+
+    <div class="invoice-edit-actions no-print">
+      <button type="button" class="btn btn-outline" data-invoice-close>Cancelar</button>
+      <button type="submit" class="btn btn-primary">Guardar cambios</button>
+    </div>
+  </form>
+</div>
+{{end}}

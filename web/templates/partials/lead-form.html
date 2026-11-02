@@ -1,0 +1,47 @@
+{{define "lead-form"}}
+<form class="lead-form" method="post" action="/contacto" data-ajax-form novalidate>
+  <div class="form-grid">
+    <label>Nombre y apellidos
+      <input name="name" maxlength="120" autocomplete="name" required>
+    </label>
+    <label>Email
+      <input type="email" name="email" maxlength="160" autocomplete="email" placeholder="tu@clinica.com">
+    </label>
+    <label>Teléfono
+      <input name="phone" maxlength="40" autocomplete="tel" placeholder="+34 600 000 000">
+    </label>
+    <label>Clínica o centro
+      <input name="clinic" maxlength="160" autocomplete="organization">
+    </label>
+    <label class="span-2">Sector
+      <select name="sector">
+        <option value="">Selecciona un sector</option>
+        {{range .Sectors}}<option value="{{.Name}}">{{.Name}}</option>{{end}}
+      </select>
+    </label>
+    <label class="span-2">¿Qué necesitas?
+      <textarea name="message" rows="3" maxlength="2000" placeholder="Cuéntanos cómo podemos ayudarte"></textarea>
+    </label>
+  </div>
+
+  <label class="check">
+    <input type="checkbox" name="consent" required>
+    <span>Acepto la política de privacidad y el tratamiento de mis datos para recibir información sobre {{.Site.SiteName}}.</span>
+  </label>
+
+  <div class="hp" aria-hidden="true">
+    <label>No rellenar<input name="website" tabindex="-1" autocomplete="off"></label>
+  </div>
+
+  {{if .TurnstileSiteKey}}
+  <div class="captcha">
+    <div class="cf-turnstile" data-sitekey="{{.TurnstileSiteKey}}" data-language="es" data-theme="light"></div>
+  </div>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  {{end}}
+
+  <button class="btn btn-primary btn-block" type="submit">Solicitar demostración</button>
+  <p class="form-status" data-form-status role="status"></p>
+  <p class="form-legal">Sin compromiso. Te contactamos en menos de 24 h laborables.</p>
+</form>
+{{end}}

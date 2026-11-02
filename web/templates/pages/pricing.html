@@ -1,0 +1,58 @@
+{{define "content"}}
+<section class="page-hero">
+  <div class="container">
+    <p class="eyebrow">Precios</p>
+    <h1>La aplicación, tal y como está, es gratis</h1>
+    <p class="lede">Úsala sin coste. Solo pagas si necesitas desarrollo a medida, alojamiento en mis servidores o servicio técnico.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="pricing-grid">
+      {{range .Plans}}
+      <article class="plan{{if .Highlighted}} is-featured{{end}}">
+        {{if .Highlighted}}<span class="plan-badge">Gratis</span>{{end}}
+        <h3>{{.Name}}</h3>
+        <p class="plan-desc">{{.Description}}</p>
+        <p class="plan-price"><strong>{{.Price}}</strong><span>{{.Period}}</span></p>
+        <ul class="check-list">
+          {{range .Features}}<li>{{icon "check"}}<span>{{.}}</span></li>{{end}}
+        </ul>
+        <a class="btn {{if .Highlighted}}btn-primary{{else}}btn-outline{{end}} btn-block" href="/contacto">Empezar</a>
+      </article>
+      {{end}}
+    </div>
+    <p class="pricing-note">Precios sin IVA. Alojamiento y servicio técnico con contratación anual. Desarrollo a medida desde 45 €. Despliegue: 25 € en mi servidor; en el tuyo desde 60 € según accesos, dominio y migración de datos.</p>
+  </div>
+</section>
+
+<section class="section section-soft">
+  <div class="container">
+    <div class="section-head center">
+      <p class="eyebrow">Preguntas frecuentes</p>
+      <h2>Todo lo que necesitas saber</h2>
+    </div>
+    <div class="faq">
+      {{range .FAQs}}
+      <details>
+        <summary>{{.Question}}</summary>
+        <p>{{.Answer}}</p>
+      </details>
+      {{end}}
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="cta-band">
+      <div>
+        <h2>¿No sabes qué plan elegir?</h2>
+        <p>Te ayudamos a encontrar la opción perfecta para tu clínica.</p>
+      </div>
+      <a class="btn btn-accent" href="/contacto">Habla con un experto</a>
+    </div>
+  </div>
+</section>
+{{end}}

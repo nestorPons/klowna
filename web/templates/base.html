@@ -1,0 +1,25 @@
+{{define "base"}}<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{.Title}}</title>
+  <meta name="description" content="{{.Description}}">
+  <meta property="og:title" content="{{.Title}}">
+  <meta property="og:description" content="{{.Description}}">
+  <meta property="og:type" content="website">
+  <meta name="theme-color" content="#FBF8F5">
+  <link rel="icon" href="/static/img/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/css/theme.css?v=7">
+  <link rel="stylesheet" href="/static/css/style.css?v=11">
+</head>
+<body>
+  <a class="skip-link" href="#main">Saltar al contenido</a>
+  {{template "header" .}}
+  <main id="main">
+    {{template "content" .}}
+  </main>
+  {{template "footer" .}}
+  <script src="/static/js/main.js?v=2" defer></script>
+</body>
+</html>{{end}}

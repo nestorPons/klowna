@@ -1,0 +1,118 @@
+{{define "settings-apariencia-block"}}
+<form method="post" action="/app/configuracion" class="theme-form" data-theme-form>
+  <section class="app-section">
+    <div class="app-section-head">
+      <div>
+        <h2>Paletas</h2>
+        <p class="muted">Elige una combinación basada en la paleta de Klowna.</p>
+      </div>
+      <span class="theme-live-pill">{{icon "palette"}} Vista previa en vivo</span>
+    </div>
+
+    <div class="theme-presets">
+      {{range .ThemePresets}}
+      <label class="theme-preset">
+        <input type="radio" name="preset" value="{{.Slug}}"
+          data-bg="{{.Theme.Bg}}" data-surface="{{.Theme.Surface}}" data-surface2="{{.Theme.Surface2}}"
+          data-text="{{.Theme.Text}}" data-muted="{{.Theme.Muted}}"
+          data-accent="{{.Theme.Accent}}" data-accent-pressed="{{.Theme.AccentPressed}}"
+          data-accent-soft="{{.Theme.AccentSoft}}" data-gold="{{.Theme.Gold}}" data-sage="{{.Theme.Sage}}"
+          {{if eq .Slug $.Theme.Preset}}checked{{end}}>
+        <span class="theme-swatch" aria-hidden="true">
+          <span style="background: {{.Theme.Bg}}"></span>
+          <span style="background: {{.Theme.AccentSoft}}"></span>
+          <span style="background: {{.Theme.Accent}}"></span>
+          <span style="background: {{.Theme.Gold}}"></span>
+        </span>
+        <span class="theme-preset-copy">
+          <strong>{{.Name}}</strong>
+          <em>{{.Description}}</em>
+        </span>
+      </label>
+      {{end}}
+
+      <label class="theme-preset theme-preset-custom">
+        <input type="radio" name="preset" value="custom" {{if eq .Theme.Preset "custom"}}checked{{end}}>
+        <span class="theme-swatch theme-swatch-custom" aria-hidden="true">
+          <span style="background: #faf6f0"></span>
+          <span style="background: #d8c4ac"></span>
+          <span style="background: #75162d"></span>
+          <span style="background: #b8860b"></span>
+        </span>
+        <span class="theme-preset-copy">
+          <strong>Personalizado</strong>
+          <em>Define tus propios colores con el selector.</em>
+        </span>
+      </label>
+    </div>
+  </section>
+
+  <section class="app-section">
+    <div class="app-section-head">
+      <div>
+        <h2>Colores personalizados</h2>
+        <p class="muted">Ajusta los tonos principales. Se aplican al guardar.</p>
+      </div>
+    </div>
+
+    <div class="theme-colors">
+      <label class="theme-color">
+        <span>Fondo</span>
+        <input type="color" name="bg" value="{{.Theme.Bg}}" data-var="--bg">
+        <code>{{.Theme.Bg}}</code>
+      </label>
+      <label class="theme-color">
+        <span>Superficie</span>
+        <input type="color" name="surface" value="{{.Theme.Surface}}" data-var="--surface">
+        <code>{{.Theme.Surface}}</code>
+      </label>
+      <label class="theme-color">
+        <span>Superficie alterna</span>
+        <input type="color" name="surface2" value="{{.Theme.Surface2}}" data-var="--surface-2">
+        <code>{{.Theme.Surface2}}</code>
+      </label>
+      <label class="theme-color">
+        <span>Texto</span>
+        <input type="color" name="text" value="{{.Theme.Text}}" data-var="--text">
+        <code>{{.Theme.Text}}</code>
+      </label>
+      <label class="theme-color">
+        <span>Texto secundario</span>
+        <input type="color" name="muted" value="{{.Theme.Muted}}" data-var="--muted">
+        <code>{{.Theme.Muted}}</code>
+      </label>
+      <label class="theme-color">
+        <span>Acento</span>
+        <input type="color" name="accent" value="{{.Theme.Accent}}" data-var="--accent">
+        <code>{{.Theme.Accent}}</code>
+      </label>
+      <label class="theme-color">
+        <span>Acento activo</span>
+        <input type="color" name="accentPressed" value="{{.Theme.AccentPressed}}" data-var="--accent-pressed">
+        <code>{{.Theme.AccentPressed}}</code>
+      </label>
+      <label class="theme-color">
+        <span>Acento suave</span>
+        <input type="color" name="accentSoft" value="{{.Theme.AccentSoft}}" data-var="--accent-soft">
+        <code>{{.Theme.AccentSoft}}</code>
+      </label>
+      <label class="theme-color">
+        <span>Oro</span>
+        <input type="color" name="gold" value="{{.Theme.Gold}}" data-var="--gold">
+        <code>{{.Theme.Gold}}</code>
+      </label>
+      <label class="theme-color">
+        <span>Salvia</span>
+        <input type="color" name="sage" value="{{.Theme.Sage}}" data-var="--sage">
+        <code>{{.Theme.Sage}}</code>
+      </label>
+    </div>
+  </section>
+
+  <div class="theme-actions">
+    <button class="btn btn-primary" type="submit">Guardar cambios</button>
+    <button class="btn btn-outline" type="submit" name="reset" value="1" data-theme-reset>Restablecer paleta</button>
+    <p class="muted">La configuración es personal y no afecta al resto del equipo.</p>
+  </div>
+</form>
+{{end}}

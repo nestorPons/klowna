@@ -1,0 +1,40 @@
+{{define "content"}}
+<section class="page-hero">
+  <div class="container">
+    <p class="eyebrow">Panel interno</p>
+    <h1>Solicitudes recibidas</h1>
+    <p class="lede">Últimas 200 solicitudes registradas desde la web.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    {{if .Leads}}
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Fecha</th><th>Nombre</th><th>Contacto</th><th>Clínica</th><th>Sector</th><th>Mensaje</th><th>Origen</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{range .Leads}}
+          <tr>
+            <td>{{fecha .CreatedAt}}</td>
+            <td>{{.Name}}</td>
+            <td>{{if .Email}}<a href="mailto:{{.Email}}">{{.Email}}</a>{{end}}{{if .Phone}}<br><a href="{{tel .Phone}}">{{.Phone}}</a>{{end}}</td>
+            <td>{{.Clinic}}</td>
+            <td>{{.Sector}}</td>
+            <td class="cell-message">{{.Message}}</td>
+            <td><span class="tag">{{.Source}}</span></td>
+          </tr>
+          {{end}}
+        </tbody>
+      </table>
+    </div>
+    {{else}}
+    <p class="muted">Todavía no hay solicitudes.</p>
+    {{end}}
+  </div>
+</section>
+{{end}}

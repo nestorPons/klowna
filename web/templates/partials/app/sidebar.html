@@ -1,0 +1,128 @@
+{{define "app-sidebar"}}
+<aside class="app-sidebar" id="app-sidebar">
+  <a class="brand app-brand" href="/app" aria-label="{{.Site.SiteName}} · panel">
+    <span class="brand-mark" aria-hidden="true">
+      <svg viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <rect width="32" height="32" rx="10" fill="#96675B"></rect>
+        <rect x="8" y="10" width="16" height="14" rx="3" stroke="#FBF8F5" stroke-width="2"></rect>
+        <path d="M8 14h16" stroke="#FBF8F5" stroke-width="2"></path>
+        <path d="M12 7v5M20 7v5" stroke="#FBF8F5" stroke-width="2" stroke-linecap="round"></path>
+        <circle cx="12.5" cy="19" r="1.2" fill="#FBF8F5"></circle>
+        <circle cx="16" cy="19" r="1.2" fill="#FBF8F5"></circle>
+        <circle cx="19.5" cy="19" r="1.2" fill="#FBF8F5"></circle>
+      </svg>
+    </span>
+    <span class="brand-name">{{.Site.SiteName}}</span>
+  </a>
+
+  <nav class="app-nav" aria-label="Navegación de la aplicación">
+    <a class="app-nav-link{{if eq .Path "/app"}} is-active{{end}}" href="/app">{{icon "grid"}}<span>Inicio</span></a>
+    <a class="app-nav-link{{if eq .Path "/app/agenda"}} is-active{{end}}" href="/app/agenda">{{icon "calendar"}}<span>Agenda</span></a>
+    {{if .User.IsManager}}
+    <a class="app-nav-link{{if eq .Path "/app/pacientes"}} is-active{{end}}" href="/app/pacientes">{{icon "users"}}<span>Clientes</span></a>
+    <a class="app-nav-link{{if eq .Path "/app/servicios"}} is-active{{end}}" href="/app/servicios">{{icon "box"}}<span>Servicios</span></a>
+    <a class="app-nav-link{{if eq .Path "/app/facturacion"}} is-active{{end}}" href="/app/facturacion">{{icon "card"}}<span>Facturación</span></a>
+    <a class="app-nav-link{{if eq .Path "/app/caja"}} is-active{{end}}" href="/app/caja">{{icon "euro"}}<span>Caja</span></a>
+    <details class="app-nav-group{{if .SettingsSection}} is-open{{end}}"{{if .SettingsSection}} open{{end}}>
+      <summary class="app-nav-link{{if .SettingsSection}} is-active{{end}}">
+        {{icon "settings"}}<span>Configuración</span><span class="app-nav-chevron">{{icon "chevron"}}</span>
+      </summary>
+      <div class="app-subnav">
+        <a class="app-subnav-link{{if eq .SettingsSection "apariencia"}} is-active{{end}}" href="/app/configuracion/apariencia">Apariencia</a>
+        <a class="app-subnav-link{{if eq .SettingsSection "facturacion"}} is-active{{end}}" href="/app/configuracion/facturacion">Facturación</a>
+        <a class="app-subnav-link{{if eq .SettingsSection "horario"}} is-active{{end}}" href="/app/configuracion/horario">Horario del centro</a>
+        <a class="app-subnav-link{{if eq .SettingsSection "equipo"}} is-active{{end}}" href="/app/configuracion/equipo">Equipo</a>
+        <a class="app-subnav-link{{if eq .SettingsSection "bloqueos"}} is-active{{end}}" href="/app/configuracion/bloqueos">Bloqueos y festivos</a>
+      </div>
+    </details>
+    {{end}}
+  </nav>
+
+  <details class="app-connected" open>
+    <summary class="app-connected-head">
+      {{icon "users"}}<span>Conectados</span>
+      <span class="app-connected-count">{{len .ConnectedUsers}}</span>
+    </summary>
+    <div class="app-connected-list">
+      {{range .ConnectedUsers}}
+      <button type="button" class="app-connected-user" data-user-edit="{{.ID}}" title="Editar perfil de {{.Name}}">
+        <span class="app-connected-avatar" style="--staff: {{staffColor .Color}}">
+          {{if .Avatar}}<img src="/app/usuarios/{{.ID}}/avatar" alt="">{{else}}{{solidIcon (staffIcon .Icon)}}{{end}}
+          <span class="app-connected-online" aria-hidden="true"></span>
+        </span>
+        <span class="app-connected-main">
+          <strong>{{.Name}}{{if eq .ID $.User.ID}} <em>(tú)</em>{{end}}</strong>
+          <span>{{if .IsManager}}Gestor{{else}}Empleado{{end}}{{if gt .Sessions 1}} · {{.Sessions}} sesiones{{end}}</span>
+        </span>
+      </button>
+      {{else}}
+      <p class="app-connected-empty">Sin conexiones activas.</p>
+      {{end}}
+    </div>
+  </details>
+
+  <div class="app-sidebar-foot">
+    <a class="app-nav-link" href="/">{{icon "globe"}}<span>Ver web</span></a>
+    <form method="post" action="/logout">
+      <button class="app-nav-link" type="submit">{{icon "logout"}}<span>Salir</span></button>
+    </form>
+  </div>
+</aside>
+
+<div class="modal" id="user-modal" hidden>
+  <div class="modal-backdrop" data-user-close></div>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="user-modal-title">
+    <div class="modal-head">
+      <h3 id="user-modal-title">Editar perfil</h3>
+      <button type="button" class="btn btn-icon" data-user-close aria-label="Cerrar">{{icon "x"}}</button>
+    </div>
+    <form data-user-form>
+      <input type="hidden" name="id">
+      <input type="hidden" name="avatar_data">
+      <div class="app-form-grid">
+        <div class="span-2 user-avatar-editor">
+          <span class="user-avatar-preview" data-user-avatar-preview style="--staff: #75162d">{{solidIcon "user"}}</span>
+          <div class="user-avatar-actions">
+            <label class="btn btn-outline btn-sm user-avatar-upload">Subir avatar
+              <input type="file" accept="image/*" data-user-avatar-file hidden>
+            </label>
+            <button type="button" class="btn btn-outline btn-sm" data-user-avatar-remove>Quitar</button>
+            <p class="muted">PNG, JPG o WebP. Se recorta a 160 × 160 px.</p>
+          </div>
+        </div>
+        <label>Nombre
+          <input name="name" maxlength="120" required>
+        </label>
+        <label>Email
+          <input name="email" type="email" maxlength="160" required>
+        </label>
+        <label>Color
+          <input type="color" name="color" value="#75162d">
+        </label>
+        <label>Icono
+          <select name="icon">
+            <option value="">Sin icono</option>
+            {{range serviceIcons}}<option value="{{.}}">{{.}}</option>{{end}}
+          </select>
+        </label>
+        <div class="span-2 user-pass-block">
+          <strong>Cambiar contraseña</strong>
+          <label data-user-current-pass hidden>Contraseña actual
+            <input type="password" name="current_password" autocomplete="current-password">
+          </label>
+          <label>Nueva contraseña
+            <input type="password" name="password" minlength="8" autocomplete="new-password" placeholder="Dejar vacío para no cambiarla">
+          </label>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <div class="modal-actions-left"><span class="muted" data-user-meta></span></div>
+        <div class="modal-actions-right">
+          <button type="button" class="btn btn-outline" data-user-close>Cancelar</button>
+          <button type="submit" class="btn btn-primary">Guardar</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{{end}}

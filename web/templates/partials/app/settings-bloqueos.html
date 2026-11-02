@@ -1,0 +1,138 @@
+{{define "settings-bloqueos-block"}}
+<section class="app-section">
+  <div class="app-section-head">
+    <div>
+      <h2>Horas cerradas por empleado</h2>
+      <p class="muted">Bloquea tramos de la agenda de un empleado para que aparezcan como cerrados.</p>
+    </div>
+  </div>
+
+  <form method="post" action="/app/configuracion/bloque" class="block-form">
+    <div class="block-form-grid">
+      <label>Empleado
+        <select name="staff_id" required>
+          <option value="">Selecciona…</option>
+          {{range .Staff}}<option value="{{.ID}}">{{.Name}}</option>{{end}}
+        </select>
+      </label>
+      <label>Día
+        <select name="weekday" required>
+          <option value="1">Lunes</option>
+          <option value="2">Martes</option>
+          <option value="3">Miércoles</option>
+          <option value="4">Jueves</option>
+          <option value="5">Viernes</option>
+          <option value="6">Sábado</option>
+          <option value="0">Domingo</option>
+        </select>
+      </label>
+      <label>Desde
+        <input type="text" name="start" required data-time24 inputmode="numeric" maxlength="5" placeholder="HH:MM" pattern="([01][0-9]|2[0-3]):[0-5][0-9]" autocomplete="off">
+      </label>
+      <label>Hasta
+        <input type="text" name="end" required data-time24 inputmode="numeric" maxlength="5" placeholder="HH:MM" pattern="([01][0-9]|2[0-3]):[0-5][0-9]" autocomplete="off">
+      </label>
+      <label>Motivo
+        <input name="reason" maxlength="120" placeholder="Comida, descanso…">
+      </label>
+      <label class="block-all-days"><input type="checkbox" name="all_days" value="1"> Todos los días</label>
+      <button class="btn btn-outline" type="submit">{{icon "plus"}} Añadir bloque</button>
+    </div>
+  </form>
+
+  {{if .ScheduleBlocks}}
+  <div class="block-list">
+    {{range .ScheduleBlocks}}
+    {{$b := .}}
+    <details class="block-item">
+      <summary class="block-summary">
+        <span class="block-staff">{{.StaffName}}</span>
+        <span class="block-day">{{weekdayName .Weekday}}</span>
+        <span class="block-time">{{.Start}}–{{.End}}</span>
+        <span class="block-reason">{{if .Reason}}{{.Reason}}{{else}}—{{end}}</span>
+        <span class="block-edit">{{icon "settings"}} Editar</span>
+      </summary>
+      <form method="post" action="/app/configuracion/bloque/{{.ID}}" class="block-form-grid">
+        <label>Empleado
+          <select name="staff_id" required>
+            {{range $.Staff}}<option value="{{.ID}}"{{if eq .ID $b.StaffID}} selected{{end}}>{{.Name}}</option>{{end}}
+          </select>
+        </label>
+        <label>Día
+          <select name="weekday" required>
+            <option value="1"{{if eq $b.Weekday 1}} selected{{end}}>Lunes</option>
+            <option value="2"{{if eq $b.Weekday 2}} selected{{end}}>Martes</option>
+            <option value="3"{{if eq $b.Weekday 3}} selected{{end}}>Miércoles</option>
+            <option value="4"{{if eq $b.Weekday 4}} selected{{end}}>Jueves</option>
+            <option value="5"{{if eq $b.Weekday 5}} selected{{end}}>Viernes</option>
+            <option value="6"{{if eq $b.Weekday 6}} selected{{end}}>Sábado</option>
+            <option value="0"{{if eq $b.Weekday 0}} selected{{end}}>Domingo</option>
+          </select>
+        </label>
+        <label>Desde
+          <input type="text" name="start" value="{{.Start}}" required data-time24 inputmode="numeric" maxlength="5" placeholder="HH:MM" pattern="([01][0-9]|2[0-3]):[0-5][0-9]" autocomplete="off">
+        </label>
+        <label>Hasta
+          <input type="text" name="end" value="{{.End}}" required data-time24 inputmode="numeric" maxlength="5" placeholder="HH:MM" pattern="([01][0-9]|2[0-3]):[0-5][0-9]" autocomplete="off">
+        </label>
+        <label>Motivo
+          <input name="reason" maxlength="120" value="{{.Reason}}" placeholder="Comida, descanso…">
+        </label>
+        <label class="block-all-days"><input type="checkbox" name="all_days" value="1"> Todos los días</label>
+        <button class="btn btn-primary" type="submit">Guardar cambios</button>
+      </form>
+      <form method="post" action="/app/configuracion/bloque/{{.ID}}/eliminar" class="block-delete">
+        <button class="btn btn-outline btn-danger btn-sm" type="submit">{{icon "trash"}} Eliminar</button>
+      </form>
+    </details>
+    {{end}}
+  </div>
+  {{else}}
+  <p class="muted">No hay horas cerradas configuradas.</p>
+  {{end}}
+</section>
+
+<section class="app-section">
+  <div class="app-section-head">
+    <div>
+      <h2>Festivos</h2>
+      <p class="muted">Añade fechas concretas en las que el centro cierra. En la agenda aparecerán como cerradas y no editables.</p>
+    </div>
+  </div>
+
+  <form method="post" action="/app/configuracion/festivo" class="block-form">
+    <div class="block-form-grid">
+      <label>Fecha
+        <input type="date" name="date" required>
+      </label>
+      <label>Nombre
+        <input name="name" maxlength="120" placeholder="Navidad, festivo local…">
+      </label>
+      <button class="btn btn-outline" type="submit">{{icon "plus"}} Añadir festivo</button>
+    </div>
+  </form>
+
+  {{if .Holidays}}
+  <div class="table-wrap block-list">
+    <table>
+      <thead><tr><th>Fecha</th><th>Nombre</th><th></th></tr></thead>
+      <tbody>
+        {{range .Holidays}}
+        <tr>
+          <td>{{fechaCorta .Date}}</td>
+          <td>{{if .Name}}{{.Name}}{{else}}—{{end}}</td>
+          <td class="cell-actions">
+            <form method="post" action="/app/configuracion/festivo/{{.ID}}/eliminar">
+              <button class="btn btn-icon btn-danger" type="submit" title="Eliminar festivo" aria-label="Eliminar festivo">{{icon "trash"}}</button>
+            </form>
+          </td>
+        </tr>
+        {{end}}
+      </tbody>
+    </table>
+  </div>
+  {{else}}
+  <p class="muted">No hay festivos configurados.</p>
+  {{end}}
+</section>
+{{end}}

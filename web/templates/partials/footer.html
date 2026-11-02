@@ -1,0 +1,54 @@
+{{define "footer"}}
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div class="footer-brand">
+      <a class="brand brand-light" href="/" aria-label="{{.Site.SiteName}} · inicio">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><rect width="32" height="32" rx="10" fill="#96675B"></rect><rect x="8" y="10" width="16" height="14" rx="3" stroke="#FBF8F5" stroke-width="2"></rect><path d="M8 14h16" stroke="#FBF8F5" stroke-width="2"></path><path d="M12 7v5M20 7v5" stroke="#FBF8F5" stroke-width="2" stroke-linecap="round"></path><circle cx="12.5" cy="19" r="1.2" fill="#FBF8F5"></circle><circle cx="16" cy="19" r="1.2" fill="#FBF8F5"></circle><circle cx="19.5" cy="19" r="1.2" fill="#FBF8F5"></circle></svg>
+        </span>
+        <span class="brand-name">{{.Site.SiteName}}</span>
+      </a>
+      <p>{{.Site.Tagline}}.</p>
+      <a class="btn btn-accent btn-sm" href="/login">Probar una demo</a>
+    </div>
+
+    <div>
+      <h4>Aplicación</h4>
+      <ul class="footer-links">
+        <li><a href="/#que-es">Agenda</a></li>
+        <li><a href="/#como-funciona">Cómo funciona</a></li>
+        <li><a href="/#a-medida">A medida</a></li>
+        <li><a href="/precios">Precios</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <h4>Recursos</h4>
+      <ul class="footer-links">
+        <li><a href="/preguntas-frecuentes">Preguntas frecuentes</a></li>
+        <li><a href="/contacto">Contacto</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <h4>Contacto</h4>
+      <ul class="footer-links">
+        <li><a href="mailto:{{.Site.Email}}">{{.Site.Email}}</a></li>
+        <li><a href="{{tel .Site.Phone}}">{{.Site.Phone}}</a></li>
+        <li><a href="https://wa.me/{{.Site.WhatsApp}}" rel="noopener">WhatsApp</a></li>
+        <li><a href="https://github.com/nestorpons" rel="noopener">GitHub</a></li>
+        <li><a href="https://www.linkedin.com/in/n%C3%A9stor-pons-portol%C3%A9s-61381b81/" rel="noopener">LinkedIn</a></li>
+        <li><a href="https://nestorpons.com" rel="noopener">nestorpons.com</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="container footer-bottom">
+    <p>© {{.Year}} {{.Site.SiteName}} · {{.Site.LegalNote}}</p>
+    <p>
+      <a href="https://nestorpons.com/privacidad.html" rel="noopener">Privacidad</a> ·
+      <a href="https://nestorpons.com/condiciones.html" rel="noopener">Condiciones</a>
+    </p>
+  </div>
+</footer>
+{{end}}

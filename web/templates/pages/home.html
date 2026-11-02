@@ -1,0 +1,221 @@
+{{define "content"}}
+<section class="hero">
+  <div class="container hero-grid">
+    <div class="hero-copy">
+      <span class="badge"><span class="dot"></span> Agenda electrónica · Software a medida</span>
+      <h1>Una agenda de citas, <span class="text-accent">hecha a tu medida</span></h1>
+      <p class="lede">Gestiona citas, pacientes, servicios y facturación desde una agenda electrónica que se adapta a cómo trabaja tu negocio.</p>
+      <div class="hero-actions">
+        <a class="btn btn-accent" href="/login">Probar Demo</a>
+        <a class="btn btn-outline-light" href="#como-funciona">Cómo funciona</a>
+      </div>
+      <dl class="hero-points">
+        <div><dt>24/7</dt><dd>Reserva online</dd></div>
+        <div><dt>A medida</dt><dd>Tu flujo de trabajo</dd></div>
+        <div><dt>0 Instalación</dt><dd>En la nube</dd></div>
+      </dl>
+    </div>
+
+    <div class="hero-visual">
+      <div class="app-window">
+        <div class="app-top">
+          <span></span><span></span><span></span>
+          <em>{{.Site.SiteName}} · agenda</em>
+        </div>
+        <div class="app-body">
+          <aside class="app-side" aria-hidden="true">
+            <span></span><span></span><span></span><span></span><span></span>
+          </aside>
+          <div class="app-main">
+            <div class="app-date">Octubre 2026</div>
+            <div class="app-grid" aria-hidden="true">
+              <span>L</span><span>M</span><span>X</span><span>J</span><span>V</span>
+              <span class="num">5</span><span class="num is-today">6</span><span class="num">7</span><span class="num">8</span><span class="num">9</span>
+              <span class="num">12</span><span class="num">13</span><span class="num">14</span><span class="num">15</span><span class="num">16</span>
+            </div>
+            <div class="appointments">
+              <div class="apt"><div><strong>Láser · 10:00</strong><em>Laura G. · cabina 2</em></div><span class="pill">Confirmada</span></div>
+              <div class="apt alt"><div><strong>Revisión · 11:30</strong><em>Marta R. · consulta 1</em></div><span class="pill">Nueva</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="floating-card fc-1"><span class="fc-icon">{{icon "calendar"}}</span> Cita confirmada</div>
+      <div class="floating-card fc-2"><span class="fc-icon">{{icon "chart"}}</span> +18% ocupación</div>
+    </div>
+  </div>
+</section>
+
+<section class="section dashboard-showcase">
+  <div class="container">
+    <div class="section-head center">
+      <p class="eyebrow">La agenda en acción</p>
+      <h2>Tu día completo, de un vistazo</h2>
+      <p>Profesionales, servicios con color e icono, notas y facturación conviven en un panel claro y pensado para trabajar rápido.</p>
+    </div>
+    <figure class="dashboard-figure">
+      <img src="/static/img/dashboard-agenda-day.png?v=2" alt="Panel de agenda de {{.Site.SiteName}} con las citas organizadas por profesional" width="2880" height="1800" loading="lazy">
+    </figure>
+  </div>
+</section>
+
+<section class="logos">
+  <div class="container">
+    <p class="logos-title">Todo en una sola agenda electrónica</p>
+    <div class="logos-row">
+      <span>Agenda 24/7</span><span>Recordatorios automáticos</span><span>Pacientes y servicios</span><span>Facturación integrada</span>
+    </div>
+  </div>
+</section>
+
+<section class="section section-soft" id="que-es">
+  <div class="container">
+    <div class="section-head center">
+      <p class="eyebrow">La agenda electrónica</p>
+      <h2>Todo lo que necesitas para gestionar tu agenda</h2>
+      <p>Una sola herramienta para organizar citas, cuidar a tus pacientes y hacer crecer tu negocio.</p>
+    </div>
+    <div class="card-grid col-3">
+      {{range .Challenges}}
+      <article class="card">
+        <span class="icon-box">{{icon .Icon}}</span>
+        <h3>{{.Title}}</h3>
+        <p>{{.Description}}</p>
+      </article>
+      {{end}}
+    </div>
+  </div>
+</section>
+
+<section class="section" id="como-funciona">
+  <div class="container">
+    <div class="section-head center">
+      <p class="eyebrow">Cómo funciona</p>
+      <h2>Tu agenda lista en tres pasos</h2>
+      <p>Sin instalaciones ni complicaciones: empieza a recibir reservas desde el primer día.</p>
+    </div>
+    <div class="card-grid col-3">
+      <article class="card">
+        <span class="icon-box">{{icon "calendar"}}</span>
+        <h3>Configura tu agenda</h3>
+        <p>Define tus servicios, profesionales y horarios para que la disponibilidad refleje siempre tu día a día.</p>
+      </article>
+      <article class="card">
+        <span class="icon-box">{{icon "smartphone"}}</span>
+        <h3>Comparte tu enlace</h3>
+        <p>Tus pacientes reservan online 24/7 desde cualquier dispositivo, sin llamadas ni idas y venidas.</p>
+      </article>
+      <article class="card">
+        <span class="icon-box">{{icon "chart"}}</span>
+        <h3>Gestiona el día a día</h3>
+        <p>Controla citas, pacientes y facturación desde un único panel, con toda la información a mano.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="stats">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat"><strong>24/7</strong><span>Reservas online sin llamadas</span></div>
+      <div class="stat"><strong>100%</strong><span>Adaptado a tu negocio</span></div>
+      <div class="stat"><strong>0</strong><span>Instalaciones y mantenimiento</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="ecosistema">
+  <div class="container">
+    <div class="section-head">
+      <p class="eyebrow">El ecosistema</p>
+      <h2>Una agenda para cada tipo de negocio</h2>
+      <p>Elige tu sector y descubre cómo {{.Site.SiteName}} se adapta a tu día a día.</p>
+    </div>
+    <div class="tabs" role="tablist" aria-label="Sectores">
+      {{range $i, $s := .Sectors}}
+      <button class="tab{{if eq $i 0}} is-active{{end}}" type="button" role="tab" data-tab="panel-{{$s.ID}}" aria-selected="{{if eq $i 0}}true{{else}}false{{end}}">{{$s.Name}}</button>
+      {{end}}
+    </div>
+
+    {{range $i, $s := .Sectors}}
+    <div class="eco tab-panel{{if eq $i 0}} is-active{{end}}" id="panel-{{$s.ID}}" role="tabpanel">
+      <div class="eco-copy">
+        <h3>{{$s.Tagline}}</h3>
+        <p>{{$s.Description}}</p>
+        <ul class="chip-list">
+          {{range $s.Specialties}}<li><a href="/{{.SectorSlug}}/{{.Slug}}">{{.Name}}</a></li>{{end}}
+        </ul>
+        <a class="btn btn-primary" href="/{{$s.Slug}}">Saber más</a>
+      </div>
+      <div class="eco-visual">
+        <div class="mini-row"><span class="mini-dot"></span><div><strong>Agenda inteligente</strong><em>Sin huecos, sin llamadas</em></div><span class="mini-pill">Activa</span></div>
+        <div class="mini-row"><span class="mini-dot alt"></span><div><strong>Historia clínica</strong><em>Firma digital incluida</em></div><span class="mini-pill">Segura</span></div>
+        <div class="mini-row"><span class="mini-dot"></span><div><strong>Facturación</strong><em>Cobros y presupuestos</em></div><span class="mini-pill">Integrada</span></div>
+        <div class="mini-chart" aria-hidden="true">
+          <span class="bar b1"></span><span class="bar b2"></span><span class="bar b3"></span>
+          <span class="bar b4"></span><span class="bar b5"></span><span class="bar b6"></span>
+        </div>
+      </div>
+    </div>
+    {{end}}
+  </div>
+</section>
+
+<section class="section section-soft" id="a-medida">
+  <div class="container">
+    <div class="section-head center">
+      <p class="eyebrow">Software a medida</p>
+      <h2>El software se adapta a ti, no al revés</h2>
+      <p>Analizamos cómo trabaja cada negocio y desarrollamos una agenda electrónica a medida: sin módulos que sobran y con las funciones que de verdad necesitas.</p>
+    </div>
+    <div class="card-grid col-3">
+      <article class="card">
+        <span class="icon-box">{{icon "search"}}</span>
+        <h3>Análisis y diseño</h3>
+        <p>Estudiamos tus procesos, tu equipo y tus servicios para diseñar una agenda que encaje con tu día a día.</p>
+      </article>
+      <article class="card">
+        <span class="icon-box">{{icon "grid"}}</span>
+        <h3>Desarrollo a medida</h3>
+        <p>Construimos la herramienta contigo y la adaptamos a medida que tu negocio crece y cambian tus necesidades.</p>
+      </article>
+      <article class="card">
+        <span class="icon-box">{{icon "euro"}}</span>
+        <h3>Precio competitivo</h3>
+        <p>Trabajamos con presupuesto cerrado, sin costes ocultos: pagas solo por lo que usas.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="cta-band">
+      <div>
+        <h2>Software a medida, precio competitivo</h2>
+        <p>Trato directo y presupuesto sin sorpresas. Cuéntanos cómo trabajas y te propondremos una solución a tu medida.</p>
+      </div>
+      <a class="btn btn-accent" href="/contacto">Cuéntanos tu caso</a>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="demo">
+  <div class="container">
+    <div class="demo">
+      <div class="demo-copy">
+        <p class="eyebrow eyebrow-light">Hablemos</p>
+        <h2>¿Quieres ver tu agenda electrónica en acción?</h2>
+        <p>Cuéntanos cómo gestionas tus citas y prepararemos una demostración personalizada de la agenda.</p>
+        <ul class="demo-list">
+          <li>{{icon "check"}} Demo de 30 minutos, sin compromiso.</li>
+          <li>{{icon "check"}} Te ayudamos a configurar tu agenda y tus servicios.</li>
+          <li>{{icon "check"}} Formación incluida para tu equipo.</li>
+        </ul>
+        <p class="demo-contact">O llámanos al <a href="{{tel .Site.Phone}}">{{.Site.Phone}}</a> · <a href="https://wa.me/{{.Site.WhatsApp}}" rel="noopener">Escríbenos por WhatsApp</a></p>
+      </div>
+      {{template "lead-form" .}}
+    </div>
+  </div>
+</section>
+{{end}}

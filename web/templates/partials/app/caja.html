@@ -1,0 +1,231 @@
+{{define "caja-block"}}
+<section class="app-section caja" id="caja">
+  <div class="app-section-head">
+    <div>
+      <h2>Caja diaria</h2>
+      <p class="muted">Apertura, cobros, gastos, arqueo y cierre de la caja.</p>
+    </div>
+    <div class="caja-nav">
+      <a class="btn btn-icon" href="/app/caja?date={{.CashPrevDate}}" aria-label="Día anterior">{{icon "arrow-left"}}</a>
+      <span class="agenda-date">{{fechaCorta .CashDate}}</span>
+      <a class="btn btn-icon" href="/app/caja?date={{.CashNextDate}}" aria-label="Día siguiente">{{icon "arrow-right"}}</a>
+      <a class="btn btn-outline btn-sm" href="/app/caja">Hoy</a>
+    </div>
+  </div>
+
+  {{if .FormOK}}<div class="alert alert-success" role="status">Cambios guardados correctamente.</div>{{end}}
+  {{if .FormError}}<div class="alert alert-error" role="alert">{{.FormError}}</div>{{end}}
+
+  {{if not .CashSession}}
+    {{if .CashIsToday}}
+    <div class="caja-open">
+      <div>
+        <h3>Abrir caja de hoy</h3>
+        <p class="muted">Indica el fondo inicial con el que empiezas el día.</p>
+      </div>
+      <form class="caja-open-form" method="post" action="/app/caja/abrir">
+        <input type="hidden" name="date" value="{{.CashDate}}">
+        <label>Fondo inicial (€)
+          <input name="opening_amount" type="number" min="0" step="0.01" value="0.00" required>
+        </label>
+        <button class="btn btn-primary" type="submit">{{icon "euro"}} Abrir caja</button>
+      </form>
+    </div>
+    {{else}}
+    <p class="muted">No hay caja registrada para este día. <a href="/app/caja">Ir a la caja de hoy</a>.</p>
+    {{end}}
+  {{else}}
+  {{with .CashSession}}
+  <div class="caja-status-bar">
+    <div>
+      <span class="status {{if .IsOpen}}status-confirmada{{else}}status-pagada{{end}}">{{if .IsOpen}}Abierta{{else}}Cerrada{{end}}</span>
+      <strong>{{fechaCorta .Date}}</strong>
+      <span class="muted">Fondo inicial {{money .OpeningAmount}}</span>
+    </div>
+    {{if not .IsOpen}}<span class="muted">Cerrada {{if .ClosedAt}}{{.ClosedAt.Format "15:04"}}{{end}}</span>{{end}}
+  </div>
+
+  <div class="stat-cards caja-stats">
+    <div class="stat-card">
+      <span class="stat-card-icon">{{icon "euro"}}</span>
+      <strong>{{money $.CashSummary.ExpectedCash}}</strong>
+      <span>Efectivo esperado</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-card-icon">{{icon "card"}}</span>
+      <strong>{{money $.CashSummary.TotalIncome}}</strong>
+      <span>Cobros del día</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-card-icon">{{icon "box"}}</span>
+      <strong>{{money $.CashSummary.TotalExpenses}}</strong>
+      <span>Gastos del día</span>
+    </div>
+    <div class="stat-card{{if lt $.CashSummary.Difference 0.0}} is-negative{{end}}">
+      <span class="stat-card-icon">{{icon "chart"}}</span>
+      <strong>{{if .IsOpen}}—{{else}}{{money $.CashSummary.Difference}}{{end}}</strong>
+      <span>{{if .IsOpen}}Descuadre al cerrar{{else}}Descuadre{{end}}</span>
+    </div>
+  </div>
+
+  <div class="caja-grid">
+    <div class="caja-panel">
+      <div class="caja-panel-head"><h3>Cobros por forma de pago</h3></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Forma de pago</th><th>Cobros</th><th>Gastos</th><th>Neto</th></tr></thead>
+          <tbody>
+            {{range $.CashSummary.Methods}}
+            <tr>
+              <td>{{paymentLabel .Method}}</td>
+              <td>{{money .Income}}</td>
+              <td>{{money .Expenses}}</td>
+              <td>{{money (net .Income .Expenses)}}</td>
+            </tr>
+            {{end}}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="caja-panel">
+      <div class="caja-panel-head">
+        <h3>Movimientos</h3>
+        <span class="muted">{{len $.CashMovements}} registros</span>
+      </div>
+      {{if $.CashMovements}}
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Tipo</th><th>Hora</th><th>Concepto</th><th>Método</th><th>Importe</th><th></th></tr></thead>
+          <tbody>
+            {{range $.CashMovements}}
+            <tr>
+              <td><span class="status {{if eq .MovementType "gasto"}}status-no_asistida{{else}}status-abonada{{end}}">{{if eq .MovementType "gasto"}}Gasto{{else}}Cobro{{end}}</span></td>
+              <td>{{hora .CreatedAt}}</td>
+              <td>
+                {{.Concept}}
+                {{if .InvoiceID}}<a class="caja-link" href="/app/facturas/{{.InvoiceID}}?modal=1">Factura</a>
+                {{else if .AppointmentID}}<a class="caja-link" href="/app/agenda?date={{.CreatedAt.Format "2006-01-02"}}">Señal</a>{{end}}
+              </td>
+              <td>{{paymentLabel .PaymentMethod}}</td>
+              <td class="{{if eq .MovementType "gasto"}}caja-negative{{else}}caja-positive{{end}}">
+                {{if eq .MovementType "gasto"}}−{{end}}{{money .Amount}}
+              </td>
+              <td class="cell-actions">
+                {{if $.CashSession.IsOpen}}
+                <form method="post" action="/app/caja/movimiento/{{.ID}}/eliminar">
+                  <input type="hidden" name="date" value="{{$.CashSession.Date}}">
+                  <button class="btn btn-icon btn-danger" type="submit" title="Eliminar movimiento">{{icon "trash"}}</button>
+                </form>
+                {{end}}
+              </td>
+            </tr>
+            {{end}}
+          </tbody>
+        </table>
+      </div>
+      {{else}}
+      <p class="muted">Sin movimientos registrados.</p>
+      {{end}}
+
+      {{if .IsOpen}}
+      <form class="caja-movement-form" method="post" action="/app/caja/movimiento">
+        <input type="hidden" name="session_id" value="{{.ID}}">
+        <label>Tipo
+          <select name="movement_type">
+            <option value="ingreso">Cobro / ingreso</option>
+            <option value="gasto">Gasto</option>
+          </select>
+        </label>
+        <label>Forma de pago
+          <select name="payment_method">
+            {{range paymentMethods}}<option value="{{.Value}}">{{.Label}}</option>{{end}}
+          </select>
+        </label>
+        <label>Importe (€)
+          <input name="amount" type="number" min="0.01" step="0.01" required placeholder="0,00">
+        </label>
+        <label>Concepto
+          <input name="concept" maxlength="255" placeholder="Detalle del movimiento">
+        </label>
+        <button class="btn btn-outline" type="submit">{{icon "plus"}} Añadir movimiento</button>
+      </form>
+      {{end}}
+    </div>
+  </div>
+
+  {{if .IsOpen}}
+  <div class="caja-close">
+    <div class="caja-panel-head">
+      <div>
+        <h3>Cierre de caja</h3>
+        <p class="muted">Introduce el efectivo contado. El descuadre se calcula contra el efectivo esperado.</p>
+      </div>
+    </div>
+    <form method="post" action="/app/caja/cerrar" data-cash-form data-expected="{{$.CashSummary.ExpectedCash}}" data-opening="{{.OpeningAmount}}">
+      <input type="hidden" name="session_id" value="{{.ID}}">
+      <label class="caja-counted-field">Efectivo contado (€)
+        <input name="counted_amount" type="number" min="0" step="0.01" inputmode="decimal"
+          value="{{printf "%.2f" $.CashSummary.ExpectedCash}}" data-cash-counted-input required>
+      </label>
+      <div class="cash-totals">
+        <div><span>Fondo inicial</span><strong>{{money .OpeningAmount}}</strong></div>
+        <div><span>Efectivo esperado</span><strong>{{money $.CashSummary.ExpectedCash}}</strong></div>
+        <div class="cash-diff"><span>Descuadre</span><strong data-cash-diff>0,00 €</strong></div>
+      </div>
+      <label class="caja-notes">Notas del cierre
+        <textarea name="notes" rows="2" maxlength="500" placeholder="Incidencias, cambio de fondo…"></textarea>
+      </label>
+      <button class="btn btn-primary" type="submit" data-cash-close>Cerrar caja</button>
+    </form>
+  </div>
+  {{else}}
+  <div class="caja-panel caja-closed">
+    <div class="caja-panel-head"><h3>Arqueo del cierre</h3></div>
+    <div class="cash-totals">
+      <div><span>Fondo inicial</span><strong>{{money .OpeningAmount}}</strong></div>
+      <div><span>Efectivo esperado</span><strong>{{money $.CashSummary.ExpectedCash}}</strong></div>
+      <div><span>Efectivo contado</span><strong>{{money .CountedAmount}}</strong></div>
+      <div class="cash-diff"><span>Descuadre</span><strong>{{money .Difference}}</strong></div>
+    </div>
+    {{if .Notes}}<p class="muted">{{.Notes}}</p>{{end}}
+  </div>
+  {{end}}
+  {{end}}
+  {{end}}
+
+  <div class="caja-panel caja-history">
+    <div class="caja-panel-head">
+      <div>
+        <h3>Historial de cajas</h3>
+        <p class="muted">Últimos cierres y aperturas.</p>
+      </div>
+      <a class="btn btn-outline btn-sm" href="/app/caja">Caja de hoy</a>
+    </div>
+    {{if .CashHistory}}
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Fecha</th><th>Estado</th><th>Fondo</th><th>Cobros</th><th>Gastos</th><th>Esperado</th><th>Contado</th><th>Descuadre</th><th></th></tr></thead>
+        <tbody>
+          {{range .CashHistory}}
+          <tr>
+            <td>{{fechaCorta .Date}}</td>
+            <td><span class="status {{if .IsOpen}}status-confirmada{{else}}status-pagada{{end}}">{{if .IsOpen}}Abierta{{else}}Cerrada{{end}}</span></td>
+            <td>{{money .OpeningAmount}}</td>
+            <td>{{money .Income}}</td>
+            <td>{{money .Expenses}}</td>
+            <td>{{money .ExpectedCash}}</td>
+            <td>{{if .IsOpen}}—{{else}}{{money .CountedAmount}}{{end}}</td>
+            <td class="{{if lt .Difference 0.0}}caja-negative{{else if gt .Difference 0.0}}caja-positive{{end}}">{{if .IsOpen}}—{{else}}{{money .Difference}}{{end}}</td>
+            <td><a class="btn btn-sm btn-outline" href="/app/caja?date={{.Date}}">Ver</a></td>
+          </tr>
+          {{end}}
+        </tbody>
+      </table>
+    </div>
+    {{else}}
+    <p class="muted">Todavía no hay cajas registradas.</p>
+    {{end}}
+  </div>
+</section>
+{{end}}

@@ -1,0 +1,16 @@
+{{define "invoice-row-block"}}
+<tr class="invoice-row" data-invoice-id="{{.ID}}" title="Doble clic para ver la factura">
+  <td>{{.Number}}</td>
+  <td>{{.PatientName}}</td>
+  <td>{{.Concept}}</td>
+  <td>{{fecha .IssuedAt}}</td>
+  <td>{{money .Amount}}</td>
+  <td><span class="status status-{{.Status}}">{{.Status}}</span></td>
+  <td class="cell-actions">
+    <button class="btn btn-sm btn-outline" type="button" data-invoice-view="{{.ID}}">Ver</button>
+    {{if eq .Status "pendiente"}}
+    <button class="btn btn-sm btn-primary" type="button" data-invoice-view="{{.ID}}">Cobrar</button>
+    {{end}}
+  </td>
+</tr>
+{{end}}

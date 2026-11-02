@@ -1,0 +1,72 @@
+{{define "header"}}
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="/" aria-label="{{.Site.SiteName}} · inicio">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 32 32" fill="none" aria-hidden="true">
+          <rect width="32" height="32" rx="10" fill="#96675B"></rect>
+          <rect x="8" y="10" width="16" height="14" rx="3" stroke="#FBF8F5" stroke-width="2"></rect>
+          <path d="M8 14h16" stroke="#FBF8F5" stroke-width="2"></path>
+          <path d="M12 7v5M20 7v5" stroke="#FBF8F5" stroke-width="2" stroke-linecap="round"></path>
+          <circle cx="12.5" cy="19" r="1.2" fill="#FBF8F5"></circle>
+          <circle cx="16" cy="19" r="1.2" fill="#FBF8F5"></circle>
+          <circle cx="19.5" cy="19" r="1.2" fill="#FBF8F5"></circle>
+        </svg>
+      </span>
+      <span class="brand-name">{{.Site.SiteName}}</span>
+    </a>
+
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-nav">
+      <span class="sr-only">Abrir menú</span>
+      <span class="bar"></span>
+      <span class="bar"></span>
+      <span class="bar"></span>
+    </button>
+
+    <nav id="primary-nav" class="primary-nav" aria-label="Navegación principal">
+      <div class="nav-item has-dropdown">
+        <button class="nav-link" type="button" aria-expanded="false">
+          Negocios {{icon "chevron"}}
+        </button>
+        <div class="dropdown dropdown-mega">
+          {{range .Sectors}}
+          <div class="dropdown-col">
+            <a class="dropdown-heading" href="/{{.Slug}}">{{.Name}}</a>
+            {{range .Specialties}}
+            <a class="dropdown-link" href="/{{.SectorSlug}}/{{.Slug}}">{{.Name}}</a>
+            {{end}}
+          </div>
+          {{end}}
+        </div>
+      </div>
+
+      <div class="nav-item has-dropdown">
+        <button class="nav-link" type="button" aria-expanded="false">
+          Soluciones {{icon "chevron"}}
+        </button>
+        <div class="dropdown dropdown-list">
+          <a class="dropdown-link" href="https://aibotia.com" target="_blank" rel="noopener">Bot WhatsApp</a>
+        </div>
+      </div>
+
+      <a class="nav-link" href="/precios">Precios</a>
+
+      <div class="nav-item has-dropdown">
+        <button class="nav-link" type="button" aria-expanded="false">
+          Recursos {{icon "chevron"}}
+        </button>
+        <div class="dropdown dropdown-list">
+          <a class="dropdown-link" href="/preguntas-frecuentes">Preguntas frecuentes</a>
+        </div>
+      </div>
+
+      <a class="nav-link" href="/contacto">Contacto</a>
+
+      <div class="nav-actions">
+        <a class="btn btn-ghost btn-sm" href="/contacto">Hablemos</a>
+        <a class="btn btn-primary btn-sm" href="/login">Prueba {{.Site.SiteName}}</a>
+      </div>
+    </nav>
+  </div>
+</header>
+{{end}}

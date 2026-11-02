@@ -1,0 +1,54 @@
+{{define "patients-block"}}
+<section class="app-section" id="patients">
+  <div class="app-section-head">
+    <div>
+      <h2>Clientes</h2>
+      <p class="muted">Ficha y seguimiento de tus clientes.</p>
+    </div>
+    <input class="app-search" type="search" name="q" placeholder="Buscar cliente…"
+      hx-get="/app/pacientes" hx-trigger="keyup changed delay:300ms, search" hx-target="#patients-list" hx-swap="outerHTML" hx-replace-url="true" value="{{.Query}}">
+  </div>
+
+  {{if .FormError}}<div class="alert alert-error" role="alert">{{.FormError}}</div>{{end}}
+
+  <details class="app-create">
+    <summary>{{icon "plus"}} Nuevo cliente</summary>
+    <form class="app-form-grid" hx-post="/app/pacientes" hx-target="#patients" hx-swap="outerHTML">
+      <label>Nombre
+        <input name="name" maxlength="120" required autocomplete="name">
+      </label>
+      <label>Email
+        <input type="email" name="email" maxlength="160" autocomplete="email">
+      </label>
+      <label>Teléfono
+        <input name="phone" maxlength="40" autocomplete="tel">
+      </label>
+      <label class="span-2">Notas
+        <textarea name="notes" rows="2" maxlength="2000"></textarea>
+      </label>
+      <button class="btn btn-primary" type="submit">Guardar cliente</button>
+    </form>
+  </details>
+
+  {{template "patients-list-content" .}}
+</section>
+{{end}}
+
+{{define "patients-list-content"}}
+  <div class="app-list" id="patients-list">
+    {{if .Patients}}
+      {{range .Patients}}
+      <a class="app-list-item is-link" href="/app/pacientes/{{.ID}}">
+        <span class="avatar">{{initials .Name}}</span>
+        <div class="app-list-main">
+          <strong>{{.Name}}</strong>
+          <em>{{if .Email}}{{.Email}}{{else}}{{.Phone}}{{end}}</em>
+        </div>
+        <span class="link-arrow">{{icon "arrow-right"}}</span>
+      </a>
+      {{end}}
+    {{else}}
+      <p class="muted">No se han encontrado clientes.</p>
+    {{end}}
+  </div>
+{{end}}

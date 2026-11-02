@@ -1,0 +1,72 @@
+/* ==========================================================================
+   Tema Klowna — paleta cálida extraída de las referencias de color
+   Burdeos (#75162D), crema (#FAF6F0), beige (#E0D6B8), oro (#B8860B),
+   rosa empolvado (#C4A69B), oliva (#BAB8A2) y espresso (#5C4336).
+   ========================================================================== */
+
+:root {
+  color-scheme: light;
+
+  /* Superficies y texto */
+  --bg: #faf6f0;
+  --surface: #fffdf9;
+  --surface-2: #f2e8dd;
+  --surface-3: #e9dccf;
+  --text: #2e1b1f;
+  --muted: #73605c;
+  --muted-2: #8e7a74;
+
+  /* Líneas y sombras derivadas del texto */
+  --line: color-mix(in srgb, var(--text) 12%, transparent);
+  --line-strong: color-mix(in srgb, var(--text) 20%, transparent);
+  --line-accent: color-mix(in srgb, var(--accent) 34%, transparent);
+
+  /* Acento principal (burdeos) */
+  --accent: #75162d;
+  --accent-pressed: #560b18;
+  --accent-deep: #3b010b;
+  --accent-light: color-mix(in srgb, var(--accent) 45%, var(--surface));
+  --accent-soft: #f3e4e4;
+  --on-accent: #fffdf8;
+
+  /* Paleta de apoyo */
+  --gold: #b8860b;
+  --gold-soft: #f2e5c6;
+  --sand: #d8c4ac;
+  --cream: #eee4da;
+  --mocha: #b7a49c;
+  --espresso: #5c4336;
+  --rosewood: #c4a69b;
+  --sage: #bab8a2;
+
+  /* Estados */
+  --warn: #a9761b;
+  --warn-soft: #f7ecd5;
+  --success: #55755e;
+  --success-soft: #e6ede5;
+  --danger: #9e2b35;
+  --danger-pressed: #7e1f28;
+  --danger-soft: #f9e8e7;
+  --danger-line: #e7bfbe;
+  --on-danger: #ffffff;
+  --overlay: rgba(26, 17, 20, 0.62);
+
+  /* Alias heredados */
+  --navy: var(--bg);
+  --navy-deep: var(--surface-2);
+  --mint: var(--accent);
+  --mint-pressed: var(--accent-pressed);
+  --mint-light: var(--accent-light);
+  --purple: var(--accent);
+  --purple-dark: var(--accent-pressed);
+  --purple-deep: var(--accent-pressed);
+  --green: var(--sage);
+  --green-dark: var(--accent-pressed);
+  --ink: var(--text);
+  --white: var(--surface);
+
+  --scheme: light;
+  --radius: 6px;
+  --shadow: 0 22px 44px color-mix(in srgb, var(--text) 10%, transparent);
+  --container: 1180px;
+}

@@ -1,0 +1,17 @@
+{{define "settings-shell"}}
+<div class="app-head">
+  <h1>Configuración</h1>
+  <p class="muted">{{.SettingsTitle}}</p>
+</div>
+
+{{if .FormOK}}<div class="alert alert-success" role="status">Cambios guardados correctamente.</div>{{end}}
+{{if .FormError}}<div class="alert alert-error" role="alert">{{.FormError}}</div>{{end}}
+
+<nav class="settings-tabs" aria-label="Secciones de configuración">
+  <a class="settings-tab{{if eq .SettingsSection "apariencia"}} is-active{{end}}" href="/app/configuracion/apariencia">Apariencia</a>
+  <a class="settings-tab{{if eq .SettingsSection "facturacion"}} is-active{{end}}" href="/app/configuracion/facturacion">Facturación</a>
+  <a class="settings-tab{{if eq .SettingsSection "horario"}} is-active{{end}}" href="/app/configuracion/horario">Horario del centro</a>
+  <a class="settings-tab{{if eq .SettingsSection "equipo"}} is-active{{end}}" href="/app/configuracion/equipo">Equipo</a>
+  <a class="settings-tab{{if eq .SettingsSection "bloqueos"}} is-active{{end}}" href="/app/configuracion/bloqueos">Bloqueos y festivos</a>
+</nav>
+{{end}}

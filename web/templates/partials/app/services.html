@@ -1,0 +1,81 @@
+{{define "services-block"}}
+<section class="app-section" id="services">
+  <div class="app-section-head">
+    <div>
+      <h2>Servicios</h2>
+      <p class="muted">Catálogo de servicios con color, icono y duración.</p>
+    </div>
+  </div>
+
+  {{if .FormError}}<div class="alert alert-error" role="alert">{{.FormError}}</div>{{end}}
+
+  <details class="app-create">
+    <summary>{{icon "plus"}} Nuevo servicio</summary>
+    <form class="app-form-grid" hx-post="/app/servicios" hx-target="#services" hx-swap="outerHTML">
+      <label>Nombre
+        <input name="name" maxlength="120" required placeholder="Consulta, masaje…">
+      </label>
+      <label>Duración (min)
+        <input name="duration_minutes" type="number" min="5" max="480" step="5" value="30" required>
+      </label>
+      <label>Precio (€ sin IVA)
+        <input name="price" type="number" min="0" step="0.01" value="0.00" required>
+      </label>
+      <label class="svc-deposit-check">Señal de reserva
+        <span class="svc-check-row">
+          <input type="checkbox" name="deposit_required" value="1">
+          <span>Exigir señal al reservar</span>
+        </span>
+      </label>
+      <label>Importe de la señal (€)
+        <input name="deposit_amount" type="number" min="0" step="0.01" value="0.00">
+      </label>
+      <label>Color
+        <input type="color" name="color" value="#75162d">
+      </label>
+      <label class="span-2">Icono
+        <select name="icon">
+          <option value="">Sin icono</option>
+          {{range serviceIcons}}<option value="{{.}}">{{.}}</option>{{end}}
+        </select>
+      </label>
+      <button class="btn btn-primary" type="submit">Guardar servicio</button>
+    </form>
+  </details>
+
+  <div class="app-list">
+    {{if .Services}}
+      {{range .Services}}
+      <div class="app-list-item">
+        <span class="svc-swatch" style="--svc: {{svcColor .Color}}">{{solidIcon (svcIcon .Icon)}}</span>
+        <div class="app-list-main">
+          <strong>{{.Name}}</strong>
+          <em>{{.DurationMinutes}} min · {{money .Price}}{{if .DepositRequired}} · Señal {{money .DepositAmount}}{{end}}</em>
+        </div>
+        <div class="svc-actions">
+          <form class="svc-inline-form" hx-post="/app/servicios/{{.ID}}" hx-target="#services" hx-swap="outerHTML" data-autosave>
+            <input name="name" value="{{.Name}}" maxlength="120" required aria-label="Nombre del servicio">
+            <input name="duration_minutes" type="number" min="5" max="480" step="5" value="{{.DurationMinutes}}" required aria-label="Duración en minutos">
+            <input name="price" type="number" min="0" step="0.01" value="{{printf "%.2f" .Price}}" required aria-label="Precio sin IVA">
+            <label class="svc-inline-check" title="Exigir señal al reservar">
+              <input type="checkbox" name="deposit_required" value="1"{{if .DepositRequired}} checked{{end}}> Señal
+            </label>
+            <input name="deposit_amount" type="number" min="0" step="0.01" value="{{printf "%.2f" .DepositAmount}}" aria-label="Importe de la señal">
+            <input type="color" name="color" value="{{svcColor .Color}}" aria-label="Color">
+            <select name="icon" aria-label="Icono">
+              <option value="">Sin icono</option>
+              {{$svc := .}}{{range serviceIcons}}<option value="{{.}}"{{if eq . $svc.Icon}} selected{{end}}>{{.}}</option>{{end}}
+            </select>
+          </form>
+          <button class="btn btn-icon btn-danger" type="button" title="Eliminar servicio"
+            hx-delete="/app/servicios/{{.ID}}" hx-target="#services" hx-swap="outerHTML"
+            hx-confirm="¿Eliminar este servicio?">{{icon "trash"}}</button>
+        </div>
+      </div>
+      {{end}}
+    {{else}}
+      <p class="muted">Todavía no hay servicios. Crea el primero.</p>
+    {{end}}
+  </div>
+</section>
+{{end}}

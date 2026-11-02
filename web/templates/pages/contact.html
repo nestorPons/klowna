@@ -1,0 +1,54 @@
+{{define "content"}}
+<section class="page-hero">
+  <div class="container">
+    <p class="eyebrow">Contacto</p>
+    <h1>Hablemos de tu agenda</h1>
+    <p class="lede">Cuéntanos cómo gestionas tus citas y te enseñaremos cómo puede ayudarte una agenda electrónica a medida.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    {{if .FormOK}}<div class="alert alert-success" role="status">¡Gracias! Hemos recibido tu solicitud. Te contactaremos muy pronto.</div>{{end}}
+    {{if .FormError}}<div class="alert alert-error" role="alert">{{.FormError}}</div>{{end}}
+
+    <div class="contact-grid">
+      <div>
+        <h2>Estamos cerca de ti</h2>
+        <p class="muted">España · Atención online. Elige el canal que prefieras y hablemos de tu proyecto.</p>
+        <ul class="contact-list">
+          <li>
+            <span class="icon-box">{{icon "mail"}}</span>
+            <div><strong>Email</strong><a href="mailto:{{.Site.Email}}">{{.Site.Email}}</a></div>
+          </li>
+          <li>
+            <span class="icon-box">{{icon "phone"}}</span>
+            <div><strong>Teléfono</strong><a href="{{tel .Site.Phone}}">{{.Site.Phone}}</a></div>
+          </li>
+          <li>
+            <span class="icon-box">{{icon "whatsapp"}}</span>
+            <div><strong>WhatsApp</strong><a href="https://wa.me/{{.Site.WhatsApp}}" rel="noopener">Hablemos por WhatsApp</a></div>
+          </li>
+          <li>
+            <span class="icon-box">{{icon "globe"}}</span>
+            <div><strong>Web</strong><a href="https://nestorpons.com" rel="noopener">nestorpons.com</a></div>
+          </li>
+          <li>
+            <span class="icon-box">{{icon "grid"}}</span>
+            <div><strong>GitHub</strong><a href="https://github.com/nestorpons" rel="noopener">github.com/nestorpons</a></div>
+          </li>
+          <li>
+            <span class="icon-box">{{icon "users"}}</span>
+            <div><strong>LinkedIn</strong><a href="https://www.linkedin.com/in/n%C3%A9stor-pons-portol%C3%A9s-61381b81/" rel="noopener">Néstor Pons Portolés</a></div>
+          </li>
+        </ul>
+      </div>
+      <div class="contact-form-panel">
+        <h2>Solicita una demostración</h2>
+        <p class="muted">Rellena el formulario y prepararemos una demostración adaptada a tu negocio.</p>
+        {{template "lead-form" .}}
+      </div>
+    </div>
+  </div>
+</section>
+{{end}}

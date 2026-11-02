@@ -1,0 +1,31 @@
+{{define "settings-equipo-block"}}
+<section class="app-section" id="settings-equipo">
+  <div class="app-section-head">
+    <div>
+      <h2>Equipo</h2>
+      <p class="muted">Asigna un icono y un color a cada trabajador para distinguirlo en la agenda.</p>
+    </div>
+    {{if .FormOK}}<span class="autosave-ok" role="status">{{icon "check"}} Guardado</span>{{end}}
+  </div>
+
+  {{if .Staff}}
+  <div class="staff-list">
+    {{range .Staff}}
+    <form class="staff-row" method="post" action="/app/configuracion/equipo/{{.ID}}"
+      hx-post="/app/configuracion/equipo/{{.ID}}" hx-target="#settings-equipo" hx-swap="outerHTML" data-autosave>
+      <span class="staff-avatar" style="--staff: {{staffColor .Color}}">{{if .Avatar}}<img src="/app/usuarios/{{.ID}}/avatar" alt="">{{else}}{{solidIcon (staffIcon .Icon)}}{{end}}</span>
+      <strong class="staff-name">{{.Name}}</strong>
+      <input type="color" name="color" value="{{staffColor .Color}}" aria-label="Color de {{.Name}}">
+      <select name="icon" aria-label="Icono de {{.Name}}">
+        <option value="">Sin icono</option>
+        {{$u := .}}{{range serviceIcons}}<option value="{{.}}"{{if eq . $u.Icon}} selected{{end}}>{{.}}</option>{{end}}
+      </select>
+      <button class="btn btn-outline btn-sm" type="button" data-user-edit="{{.ID}}">Perfil</button>
+    </form>
+    {{end}}
+  </div>
+  {{else}}
+  <p class="muted">Aún no hay trabajadores en el equipo.</p>
+  {{end}}
+</section>
+{{end}}

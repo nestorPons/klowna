@@ -1,0 +1,76 @@
+name: klowna
+
+services:
+  db:
+    image: mariadb:11
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpass}
+      MARIADB_DATABASE: ${DB_NAME:-klowna}
+      MARIADB_USER: ${DB_USER:-klowna}
+      MARIADB_PASSWORD: ${DB_PASSWORD:-klownapass}
+    ports:
+      - "${DB_HOST_PORT:-3307}:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 24
+      start_period: 20s
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      APP_ADDR: ":8080"
+      DB_HOST: db
+      DB_PORT: "3306"
+      DB_NAME: ${DB_NAME:-klowna}
+      DB_USER: ${DB_USER:-klowna}
+      DB_PASSWORD: ${DB_PASSWORD:-klownapass}
+      ADMIN_USER: ${ADMIN_USER:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      SMTP_FROM: ${SMTP_FROM:-}
+      SMTP_TO: ${SMTP_TO:-}
+      TURNSTILE_SITE_KEY: ${TURNSTILE_SITE_KEY:-0x4AAAAAAFsU9zRaPwnUXFLc}
+      TURNSTILE_SECRET: ${TURNSTILE_SECRET:-}
+      TURNSTILE_SKIP: ${TURNSTILE_SKIP:-false}
+    ports:
+      # Acceso directo en local. En producción el tráfico entra por Traefik.
+      - "127.0.0.1:${APP_PORT:-8090}:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:8080/healthz"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    networks:
+      - default
+      - traefik-net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik-net"
+      - "traefik.http.routers.klowna.rule=Host(`klowna.com`) || Host(`www.klowna.com`)"
+      - "traefik.http.routers.klowna.entrypoints=web,websecure"
+      - "traefik.http.routers.klowna.tls=true"
+      - "traefik.http.routers.klowna.tls.certresolver=myresolver"
+      - "traefik.http.services.klowna.loadbalancer.server.port=8080"
+
+volumes:
+  db_data:
+
+networks:
+  # Red compartida con Traefik. En local: docker network create traefik-net
+  traefik-net:
+    external: true

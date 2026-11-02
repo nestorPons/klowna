@@ -1,0 +1,79 @@
+{{define "content"}}
+{{with .Sector}}
+<section class="sector-hero">
+  <div class="container">
+    <nav class="breadcrumb" aria-label="Ruta de navegación">
+      <a href="/">Inicio</a><span>/</span><span>{{.Name}}</span>
+    </nav>
+    <span class="icon-box large">{{icon .Icon}}</span>
+    <h1>{{.Name}}</h1>
+    <p class="lede">{{.Tagline}}</p>
+    <p>{{.Description}}</p>
+    <div class="hero-actions">
+      <a class="btn btn-accent" href="/contacto">Solicita una demo</a>
+      <a class="btn btn-outline-light" href="#especialidades">Ver especialidades</a>
+    </div>
+  </div>
+</section>
+{{end}}
+
+<section class="section" id="especialidades">
+  <div class="container">
+    <div class="section-head">
+      <p class="eyebrow">Especialidades</p>
+      <h2>Soluciones para cada tipo de centro</h2>
+      <p>Descubre cómo adaptamos {{.Site.SiteName}} a las necesidades concretas de tu actividad.</p>
+    </div>
+    <div class="specialty-grid">
+      {{range .Specialties}}
+      <a class="specialty-card" href="/{{.SectorSlug}}/{{.Slug}}">
+        <span class="icon-box">{{icon "arrow-right"}}</span>
+        <h3>{{.Name}}</h3>
+        <p>{{.Description}}</p>
+        <span class="link-arrow">Ver más {{icon "arrow-right"}}</span>
+      </a>
+      {{end}}
+    </div>
+  </div>
+</section>
+
+<section class="stats">
+  <div class="container">
+    <div class="stats-grid">
+      {{range .Stats}}
+      <div class="stat"><strong>{{.Value}}</strong><span>{{.Label}}</span></div>
+      {{end}}
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <p class="eyebrow">Incluido</p>
+      <h2>Todo lo que necesitas en un solo lugar</h2>
+    </div>
+    <div class="card-grid col-3">
+      {{range .Challenges}}
+      <article class="card">
+        <span class="icon-box">{{icon .Icon}}</span>
+        <h3>{{.Title}}</h3>
+        <p>{{.Description}}</p>
+      </article>
+      {{end}}
+    </div>
+  </div>
+</section>
+
+<section class="section section-soft">
+  <div class="container">
+    <div class="cta-band cta-band-light">
+      <div>
+        <h2>Descubre {{.Site.SiteName}} para tu centro</h2>
+        <p>Te mostramos la plataforma con ejemplos reales de tu sector.</p>
+      </div>
+      <a class="btn btn-primary" href="/contacto">Agenda una demo</a>
+    </div>
+  </div>
+</section>
+{{end}}

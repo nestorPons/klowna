@@ -1,0 +1,7 @@
+.git
+.env
+.vscode
+*.md
+docs
+bin
+tmp

@@ -1,5 +1,21 @@
 # Registro de cambios
 
+## 2026-11-02 · Icono de GitHub en la home
+
+- La home incluye un botón-icono en el hero que enlaza al repositorio `github.com/nestorPons/klowna` (nueva pestaña, `rel="noopener"`).
+- Nuevo icono relleno `github` en `internal/render/icons.go` y clase `.btn-square` (46 × 46 px, radio 6 px).
+- `style.css` pasa a `v=12`.
+
+Archivos:
+
+```text
+internal/render/icons.go
+web/templates/pages/home.html
+web/templates/base.html
+web/static/css/style.css
+docs/CHANGELOG.md
+```
+
 ## 2026-11-02 · Despliegue a producción
 
 - Backup previo: `backups/pre-deploy-20261102-080544.sql.gz` en el servidor.
